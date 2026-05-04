@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cormorant+SC:wght@300;400;600&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sc: "Cormorant SC", serif;
+  --font-mono: "DM Mono", monospace;
+  --font-sans: "Inter", "SF Pro Display", system-ui, sans-serif;
+
+  --color-fellini-black: #1d1d1f;
+  --color-fellini-stone: #f2f2f7;
+  --color-fellini-rule: #d2d2d7;
+  --color-fellini-ghost: #86868b;
+  --color-fellini-parchment: #f9f9f8;
+  --color-fellini-cream: #1d1d1f;
+  --color-fellini-white: #ffffff;
+  --color-fellini-accent: #a3854d;
+  --color-fellini-red: #ff3b30;
+  --color-fellini-green: #34c759;
+  --color-fellini-bg: #f5f5f7;
+  --color-fellini-mist: #d2d2d7;
+  --color-fellini-muted: #e5e5ea;
+
+  --color-natalia: #bf5af2;
+  --color-jemma: #5e5ce6;
+  --color-astra: #ff9f0a;
+  --color-claudia: #30d158;
+}
+
+@layer base {
+  body {
+    @apply bg-fellini-bg text-fellini-black antialiased font-sans overflow-x-hidden relative;
+  }
+}
+
+@layer utilities {
+  .data-grid-bg {
+    background-image: 
+      linear-gradient(var(--color-fellini-rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-fellini-rule) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .engine-rule {
+    @apply w-px h-24 bg-gradient-to-b from-transparent via-fellini-accent to-transparent opacity-60;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scanline-overlay {
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.05) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 50;
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+      color: black !important;
+      background: white !important;
+      padding: 20px !important;
+      border: 1px solid #333 !important;
+    }
+    body {
+      background: white !important;
+      color: black !important;
+    }
+  }
+}
