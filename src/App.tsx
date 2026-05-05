@@ -23,8 +23,173 @@ import {
   Dna,
   History,
   Clock,
-  Snowflake
+  Snowflake,
+  SunMedium,
+  XCircle,
+  RefreshCw,
+  ArrowRight,
+  Layers
 } from "lucide-react";
+
+// --- Recovery Brain Logic v2.8.0 ---
+interface RecoveryEvent {
+  id: string;
+  engine: string;
+  station: string;
+  breach: string;
+  value: string;
+  instruction: string;
+  adjustment: string;
+  recoveryProjection: number;
+}
+
+const RECOVERY_FEED: RecoveryEvent[] = [
+  {
+    id: "R01",
+    engine: "SUNDAY",
+    station: "FRY",
+    breach: "OIL_TEMP_LOW",
+    value: "165°C",
+    instruction: "HALT FRY STATION. Abort batch. Reset oil to 180°C.",
+    adjustment: "Delay SIDE-001 (Potatoes) +8min",
+    recoveryProjection: 91
+  },
+  {
+    id: "R02",
+    engine: "SUNDAY",
+    station: "STARTER",
+    breach: "YORKSHIRE_FAIL",
+    value: "Under-rise",
+    instruction: "RE-FIRE BATCH. Discard and re-fire Yorkshire batch 01.",
+    adjustment: "Delay ENGINE-09 (Meat) +12min",
+    recoveryProjection: 92
+  },
+  {
+    id: "R03",
+    engine: "DESSERT",
+    station: "PASTRY",
+    breach: "POSSET_GRAINY",
+    value: "Emulsion Fail",
+    instruction: "BLOCK BATCH. Switch recommendations to Sticky Toffee / Tiramisu.",
+    adjustment: "Flag Posset 86 until rebuild complete",
+    recoveryProjection: 94
+  },
+  {
+    id: "R04",
+    engine: "SUPPLY",
+    station: "GOODS IN",
+    breach: "ALLERGEN_MISSING_SPEC",
+    value: "No Spec Sheet",
+    instruction: "SUPPLY GATE LOCK. Reject delivery. Return to supplier.",
+    adjustment: "Flag substitution risk for Station 11",
+    recoveryProjection: 95
+  }
+];
+
+function RecoveryCommandCenter() {
+  const [activeBreach, setActiveBreach] = useState<RecoveryEvent | null>(null);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveBreach(null);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % RECOVERY_FEED.length);
+        setActiveBreach(RECOVERY_FEED[index]);
+      }, 1000);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [index]);
+
+  return (
+    <div className="fixed top-32 right-12 z-[100] w-96 font-sans no-print hidden xl:block">
+      <AnimatePresence mode="wait">
+        {activeBreach ? (
+          <motion.div
+            key={activeBreach.id}
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            className="bg-fellini-black border border-fellini-accent/40 shadow-2xl overflow-hidden rounded-xl"
+          >
+            {/* Header */}
+            <div className="bg-fellini-red px-4 py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white font-mono text-[10px] font-bold tracking-widest uppercase">
+                <AlertCircle size={14} className="animate-pulse" />
+                🚨 Breach Detected
+              </div>
+              <div className="font-mono text-[9px] text-white/70 uppercase tracking-tighter">
+                {activeBreach.engine} // {activeBreach.station}
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Breach Info */}
+              <div className="mb-6">
+                <div className="font-mono text-[9px] text-fellini-ghost uppercase tracking-widest mb-1">Detected Failure</div>
+                <div className="text-white text-lg font-bold tracking-tight">
+                  {activeBreach.breach.replace(/_/g, ' ')} — <span className="text-fellini-red">{activeBreach.value}</span>
+                </div>
+              </div>
+
+              {/* Action */}
+              <div className="bg-white/5 border-l-2 border-fellini-accent p-4 mb-6">
+                <div className="font-mono text-[9px] text-fellini-accent uppercase tracking-[0.3em] mb-2 font-bold flex items-center gap-2">
+                  <Zap size={10} /> Recovery Command
+                </div>
+                <div className="text-white text-sm leading-relaxed font-medium">
+                  {activeBreach.instruction}
+                </div>
+              </div>
+
+              {/* Adjustments */}
+              <div className="flex justify-between items-end">
+                <div>
+                  <div className="font-mono text-[8px] text-fellini-ghost uppercase tracking-widest mb-1">System Adjustment</div>
+                  <div className="text-white/80 text-xs flex items-center gap-2">
+                    <Clock size={10} className="text-fellini-accent" />
+                    {activeBreach.adjustment}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono text-[8px] text-fellini-ghost uppercase tracking-widest mb-1 font-bold">Integrity Sync</div>
+                  <div className="text-fellini-green text-sm font-bold flex items-center justify-end gap-1">
+                    <RefreshCw size={10} /> {activeBreach.recoveryProjection}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <motion.div 
+              className="h-1 bg-fellini-accent"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 7, ease: "linear" }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="stable"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="border border-fellini-rule bg-white/40 backdrop-blur-md p-4 flex items-center justify-between rounded-xl"
+          >
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={16} className="text-fellini-green" />
+              <div className="font-mono text-[10px] text-fellini-black uppercase tracking-widest font-bold">
+                System Stabilised
+              </div>
+            </div>
+            <div className="font-mono text-[8px] text-fellini-ghost uppercase">
+              FORGE_BRAIN v2.8.0 ACTIVE
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 // --- Types ---
 interface Dish {
@@ -40,40 +205,137 @@ interface Dish {
   founderLawLocked: boolean;
 }
 
+interface EngineIdentity {
+  text: string;
+  pressurePoint: string;
+}
+
+interface ExecutionLaw {
+  label: string;
+  text: string;
+}
+
+interface SupplyLink {
+  item: string;
+  source: string;
+}
+
+interface WeightsMeasuresMethod {
+  label: string;
+  value: string;
+}
+
+interface TimeLaw {
+  label: string;
+  value: string;
+}
+
+interface AllergenGate {
+  critical: string[];
+  protocol: string;
+}
+
+interface SafeGate {
+  status: string;
+  requirement: string;
+}
+
+interface ForgeValidation {
+  status: string;
+  check: string;
+}
+
+interface RecoveryLink {
+  breach: string;
+  action: string;
+}
+
+interface GPControl {
+  margin: string;
+  status: string;
+}
+
+interface PassRejectSignals {
+  pass: string;
+  reject: string;
+}
+
+interface PrintCardConfig {
+  layout: string;
+  operator: string;
+}
+
+interface EngineLayerStack {
+  identity: EngineIdentity;
+  executionLaws: ExecutionLaw[];
+  supplyLinks: SupplyLink[];
+  wmm: WeightsMeasuresMethod[];
+  timeLaw: TimeLaw[];
+  allergenGate: AllergenGate;
+  safeGate: SafeGate;
+  forgeValidation: ForgeValidation;
+  recoveryLinks: RecoveryLink[];
+  gpControl: GPControl;
+  passRejectSignals: PassRejectSignals;
+  printCard: PrintCardConfig;
+}
+
 interface Engine {
   id: string;
   num: string;
   name: string;
-  type: string;
-  identity: string;
-  pressurePoint: string;
-  controlLaws: { label: string; text: string }[];
-  allergens: string[];
-  dishes: Dish[];
+  version: string;
+  operator: string;
   lead: {
     name: string;
     role: string;
     color: string;
     icon: any;
   };
+  layers: EngineLayerStack;
+  items: Dish[];
 }
 
-// --- Data Archive v2.7.2 — ALLERGEN ENFORCEMENT LAYER v1.0 LIVE ---
+// --- Data Archive v2.8.1 — MEMORY ENGINE LIVE ---
 const ENGINES: Engine[] = [
   {
     id: "supply",
     num: "00",
-    name: "Supply Engine\nv1.0",
-    type: "Foundation System · Reality Anchor",
-    identity: "\"Anchors deterministic. System under active lock. No bad data enters the kitchen.\"",
-    pressurePoint: "Vertical Slice Lock",
-    controlLaws: [
-      { label: "Protein Procurement Law", text: "High-value proteins sourced in execution-ready format. Supplier bears trim/yield discipline. No uncontrolled in-house butchery." },
-      { label: "Supply Control Law", text: "Supplier → Pack Size → Yield → Dish → True GP → Auto Pass/Fail. All \"~\" removed from locked items." }
-    ],
-    allergens: ["N/A"],
+    name: "Supply\nEngine",
+    version: "v2.8.1.FS",
+    operator: "LOGOS",
     lead: { name: "LOGOS", role: "Supply Control", color: "#a3854d", icon: Shield },
-    dishes: [
+    layers: {
+      identity: {
+        text: "Anchors deterministic. System under active lock. No bad data enters the kitchen.",
+        pressurePoint: "Vertical Slice Lock"
+      },
+      executionLaws: [
+        { label: "Protein Law", text: "High-value proteins sourced in execution-ready format. Supplier bears yield discipline." },
+        { label: "Control Law", text: "Supplier → Pack Size → Yield → Dish → True GP. All generic items removed from lock." }
+      ],
+      supplyLinks: [
+        { item: "Proteins", source: "SUPPLY-PRT-01" },
+        { item: "Dry Goods", source: "SUPPLY-DRY-01" }
+      ],
+      wmm: [
+        { label: "Tolerance", value: "±5%" },
+        { label: "Audit", value: "Weekly" }
+      ],
+      timeLaw: [
+        { label: "Logistics", value: "30 min verify window" }
+      ],
+      allergenGate: { critical: ["N/A"], protocol: "Direct Reject on missing cert" },
+      safeGate: { status: "LOCKED", requirement: "Spec Sheet" },
+      forgeValidation: { status: "ACTIVE", check: "Visual Audit" },
+      recoveryLinks: [
+        { breach: "ALLERGEN_MISSING_SPEC", action: "SUPPLY_GATE_LOCK" }
+      ],
+      gpControl: { margin: "72%", status: "LOCKED" },
+      passRejectSignals: { pass: "Verify batch", reject: "Reject variance" },
+      printCard: { layout: "GATE-001", operator: "LOGOS" }
+    },
+    items: [
       {
         id: "sup01",
         title: "Receiving Gate",
@@ -205,16 +467,41 @@ const ENGINES: Engine[] = [
     id: "pizzas",
     num: "04",
     name: "Pizzas\nEngine",
-    type: "Neapolitan System · Station: Pizza",
-    identity: "Dough + Fior di Latte + San Marzano now fully deterministic. The highest-GP engine in the system is sealed.",
-    pressurePoint: "Cheese Moisture + Tomato Quality",
-    controlLaws: [
-      { label: "Dough Law v2.5.3", text: "260g ball. 65% Hydration. 44h Cold Ferment. Supply-Locked: £0.20/ball (buffered)." },
-      { label: "PIZZA SUPPLY LAW v1.0", text: "Dough (£0.20) + Fior di Latte (£1.152) + San Marzano (£0.43) = £1.782 locked base cost. Any variance >5% triggers immediate Supply Engine review." }
-    ],
-    allergens: ["Gluten", "Dairy"],
+    version: "v2.8.1.FS",
+    operator: "ASTRA",
     lead: { name: "ASTRA", role: "Ferment Control", color: "#e09040", icon: Flame },
-    dishes: [
+    layers: {
+      identity: {
+        text: "Dough + Fior di Latte + San Marzano now fully deterministic.",
+        pressurePoint: "Cheese Moisture + Tomato Quality"
+      },
+      executionLaws: [
+        { label: "Dough Law", text: "260g ball. 65% Hydration. 44h Cold Ferment." },
+        { label: "Supply Law", text: "Dough + Cheese + Tomato = £1.782 locked base cost." }
+      ],
+      supplyLinks: [
+        { item: "Flour", source: "Caputo Blue" },
+        { item: "Tomato", source: "San Marzano DOP" }
+      ],
+      wmm: [
+        { label: "Dough", value: "260gball" },
+        { label: "Cheese", value: "90g Fior di Latte" }
+      ],
+      timeLaw: [
+        { label: "Ferment", value: "44h Cold" },
+        { label: "Bake", value: "60-90 sec @ 450°C" }
+      ],
+      allergenGate: { critical: ["Gluten", "Dairy"], protocol: "Separate station lock" },
+      safeGate: { status: "ACTIVE", requirement: "FDT 23°C Control" },
+      forgeValidation: { status: "LIVE", check: "Base spotting" },
+      recoveryLinks: [
+        { breach: "OVER_PROOF", action: "RESET_BATCH" }
+      ],
+      gpControl: { margin: "85.7%", status: "HIGH_CARRIER" },
+      passRejectSignals: { pass: "Leopard spotting", reject: "Gum line" },
+      printCard: { layout: "STATION-PIZZA", operator: "ASTRA" }
+    },
+    items: [
       {
         id: "z00",
         title: "WMM — Pizza Core Components · Supply Locked v2.5.8",
@@ -322,16 +609,41 @@ const ENGINES: Engine[] = [
     id: "burgers",
     num: "03",
     name: "Burgers\nEngine",
-    type: "Stack Architecture · Station: Grill",
-    identity: "A burger is a structural problem. Position determines bite. Bite is the customer's experience.",
-    pressurePoint: "Patty Temp & Stack Order",
-    controlLaws: [
-      { label: "230g Protein Law", text: "Standard patty: 230g. Season before grill only. 5 min per side. 60s cloche for cheese." },
-      { label: "No-Press Law", text: "Absolute. Pressing expels juices and creates a dry, dense patty." }
-    ],
-    allergens: ["Gluten", "Dairy", "Egg", "Mustard"],
+    version: "v2.8.1.FS",
+    operator: "JEMMA",
     lead: { name: "JEMMA", role: "Field Ops", color: "#8a70e0", icon: Layout },
-    dishes: [
+    layers: {
+      identity: {
+        text: "A burger is a structural problem. Position determines bite.",
+        pressurePoint: "Patty Temp & Stack Order"
+      },
+      executionLaws: [
+        { label: "Protein Law", text: "Standard patty: 230g. Season before grill only." },
+        { label: "No-Press Law", text: "Absolute. Pressing expels juices and creates a dry patty." }
+      ],
+      supplyLinks: [
+        { item: "Beef", source: "Chuck & Brisket 80/20" },
+        { item: "Bun", source: "Brioche" }
+      ],
+      wmm: [
+        { label: "Patty", value: "230g ±5g" },
+        { label: "Cheese", value: "60s cloche melt" }
+      ],
+      timeLaw: [
+        { label: "Cook", value: "5 min per side" },
+        { label: "Rest", value: "3 min mandatory" }
+      ],
+      allergenGate: { critical: ["Gluten", "Dairy", "Mustard"], protocol: "Bun handle isolation" },
+      safeGate: { status: "ACTIVE", requirement: "75°C Internal" },
+      forgeValidation: { status: "LIVE", check: "Bun toast 'Biscuit' texture" },
+      recoveryLinks: [
+        { breach: "LOW_PATTY_TEMP", action: "REFIRE_PATTY" }
+      ],
+      gpControl: { margin: "78.4%", status: "STABLE" },
+      passRejectSignals: { pass: "Fired + Rested", reject: "Soggy bun / Raw" },
+      printCard: { layout: "STACK-001", operator: "JEMMA" }
+    },
+    items: [
       {
         id: "b00",
         title: "Burger Mince Lock v1.0",
@@ -441,16 +753,41 @@ const ENGINES: Engine[] = [
     id: "mains",
     num: "02",
     name: "Mains\nEngine",
-    type: "Fire & Precision · Station: Hot / Grill",
-    identity: "We don't cook food. We execute systems. Every sear, rest, and plate tells the story of controlled fire. Temperature is the only truth at this station.",
-    pressurePoint: "Doneness Accuracy & Rest Timing",
-    controlLaws: [
-      { label: "Control Law", text: "Every main leaves the pass at correct internal temperature. Probe is not optional." },
-      { label: "Service Law", text: "Zero live cooking thinking at the pass. Pass action only: Plate → Finish → Send." }
-    ],
-    allergens: ["Dairy", "Gluten", "Egg", "Fish"],
+    version: "v2.8.1.FS",
+    operator: "JEMMA",
     lead: { name: "JEMMA", role: "Field Ops", color: "#8a70e0", icon: Flame },
-    dishes: [
+    layers: {
+      identity: {
+        text: "We execute systems. Temperature is the only truth.",
+        pressurePoint: "Doneness Accuracy & Rest Timing"
+      },
+      executionLaws: [
+        { label: "Temp Law", text: "Every main leaves at correct internal temperature. Probe mandatory." },
+        { label: "Service Law", text: "Zero live thinking at the pass. Plate → Finish → Send." }
+      ],
+      supplyLinks: [
+        { item: "Steak", source: "35 Day Aged Ribeye" },
+        { item: "Fish", source: "Market Fresh" }
+      ],
+      wmm: [
+        { label: "Ribeye", value: "300g ±10g" },
+        { label: "Sea Bass", value: "160g ±5g" }
+      ],
+      timeLaw: [
+        { label: "Resting", value: "Steak: 5 min minimum" },
+        { label: "Firing", value: "Fish: 4 min total" }
+      ],
+      allergenGate: { critical: ["Dairy", "Fish", "Gluten"], protocol: "Color-coded boards" },
+      safeGate: { status: "READY", requirement: "Calibrated probe" },
+      forgeValidation: { status: "ACTIVE", check: "Maillard crust" },
+      recoveryLinks: [
+        { breach: "OVERCOOK_STEAK", action: "RESET_STATION_CHIEF" }
+      ],
+      gpControl: { margin: "72%", status: "STABLE" },
+      passRejectSignals: { pass: "Probed + Sauced", reject: "Cold centre" },
+      printCard: { layout: "STATION-HOT", operator: "JEMMA" }
+    },
+    items: [
       {
         id: "m01",
         title: "35 Day Aged Ribeye",
@@ -614,16 +951,41 @@ const ENGINES: Engine[] = [
     id: "desserts",
     num: "07",
     name: "Desserts\nEngine",
-    type: "Last Memory · Station: Pastry / Cold",
-    identity: "Disproportionately powerful in the review. The cleanest execution of the night.",
-    pressurePoint: "Texture Lock & Pass Speed",
-    controlLaws: [
-      { label: "Pass Law", text: "Construction target ≤60 sec. Pass hold 0 sec assembled." },
-      { label: "20 Unit Law", text: "Production in 20 blocks. Exceptions: Tort (12)." }
-    ],
-    allergens: ["Dairy", "Egg", "Gluten", "Nut"],
+    version: "v2.8.1.FS",
+    operator: "CLAUDIA",
     lead: { name: "CLAUDIA", role: "Technical Engr", color: "#50b890", icon: PieChart },
-    dishes: [
+    layers: {
+      identity: {
+        text: "The cleanest execution of the night. Margin lives here.",
+        pressurePoint: "Texture Lock & Pass Speed"
+      },
+      executionLaws: [
+        { label: "Pass Law", text: "Construction target ≤60 sec. Pass hold 0 sec assembled." },
+        { label: "Unit Law", text: "Production in 20 blocks. No single batch drifts." }
+      ],
+      supplyLinks: [
+        { item: "Chocolate", source: "70% Cocoa" },
+        { item: "Cream", source: "Double 48% Fat" }
+      ],
+      wmm: [
+        { label: "STP", value: "Production Batch 20" },
+        { label: "Tiramisu", value: "12h minimum set" }
+      ],
+      timeLaw: [
+        { label: "Assembly", value: "Max 60s" },
+        { label: "Reheat", value: "45s Microwave pulse" }
+      ],
+      allergenGate: { critical: ["Nut", "Dairy", "Egg"], protocol: "Pastry clean-down lock" },
+      safeGate: { status: "STABLE", requirement: "Bain-marie control" },
+      forgeValidation: { status: "ACTIVE", check: "Texture contrast" },
+      recoveryLinks: [
+        { breach: "UNSET_POSSET", action: "REVERT_TO_CRUMBLE" }
+      ],
+      gpControl: { margin: "76%", status: "PROFIT_ENGINE" },
+      passRejectSignals: { pass: "Cold/Hot contrast", reject: "Soft crumble" },
+      printCard: { layout: "STATION-PASTRY", operator: "CLAUDIA" }
+    },
+    items: [
       {
         id: "e01",
         title: "Sticky Toffee Pudding",
@@ -753,18 +1115,42 @@ const ENGINES: Engine[] = [
   {
     id: "ice-cream",
     num: "08",
-    name: "Ice Cream\nEngine v1.0",
-    type: "Freezer · Scoop · Overrun · Yield Control",
-    identity: "Ice cream is frozen margin. Air, temperature, scoop weight and freezer discipline decide whether dessert profit survives service.",
-    pressurePoint: "Overrun · Scoop Weight · Freezer Law",
-    controlLaws: [
-      { label: "Overrun Control", text: "Physics cannot lie. Target 15–25%. >30% = reject batch (watery). <10% = too dense/poor yield." },
-      { label: "Scoop Gate", text: "80g ±5g per levelled scoop. Weight is truth. Volume is illusion." },
-      { label: "Freezer Law", text: "-18°C core hold. Service temper -12 to -14°C. Max 4h display window." }
-    ],
-    allergens: ["Dairy", "Eggs"],
+    name: "Ice Cream\nEngine",
+    version: "v2.8.1.FS",
+    operator: "LUNA",
     lead: { name: "LUNA", role: "Cold Form", color: "#60c8b0", icon: Snowflake },
-    dishes: [
+    layers: {
+      identity: {
+        text: "Ice cream is frozen margin. Air, temperature, and scoop weight.",
+        pressurePoint: "Overrun · Scoop Weight · Freezer Law"
+      },
+      executionLaws: [
+        { label: "Overrun Law", text: "Target 15–25%. >30% = reject batch (watery)." },
+        { label: "Freezer Law", text: "-18°C core hold. Service temper -12 to -14°C." }
+      ],
+      supplyLinks: [
+        { item: "Cream", source: "DAIRY-014" },
+        { item: "Milk", source: "DAIRY-008" }
+      ],
+      wmm: [
+        { label: "Scoop", value: "80g ±5g" },
+        { label: "Batch", value: "20 units" }
+      ],
+      timeLaw: [
+        { label: "Churn", value: "25-40 min" },
+        { label: "Mature", value: "4-12h" }
+      ],
+      allergenGate: { critical: ["Dairy", "Eggs"], protocol: "Cold station isolation" },
+      safeGate: { status: "ACTIVE", requirement: "Core temp -18°C" },
+      forgeValidation: { status: "ACTIVE", check: "Overrun measured" },
+      recoveryLinks: [
+        { breach: "ICE_CRYSTALS", action: "RE-CHURN_IF_SAFE" }
+      ],
+      gpControl: { margin: "88%", status: "PROFIT_LOCK" },
+      passRejectSignals: { pass: "Levelled scoop", reject: "Ice crystals" },
+      printCard: { layout: "STATION-FREEZER", operator: "LUNA" }
+    },
+    items: [
       {
         id: "ice01",
         title: "Vanilla Custard Base",
@@ -818,16 +1204,41 @@ const ENGINES: Engine[] = [
     id: "prep",
     num: "01",
     name: "Prep Engine\n& Saucier",
-    type: "Foundation System · Station: Prep / Hot",
-    identity: "The kitchen does not begin at the pass. It begins in the stock pot, the batter jug, the fat lifecycle. Every engine above depends on this one being right before service starts.",
-    pressurePoint: "Reduction Law & Cold Chain",
-    controlLaws: [
-      { label: "Reduction Law", text: "No aggressive high-heat reduction. No side-wall scorching. Concentration is not violence." },
-      { label: "Acid Law — Baseline", text: "Dressings: 3:1 fat-to-acid ratio unless dish-specific override is declared on the card." }
-    ],
-    allergens: ["Celery", "Sulphites", "Egg", "Mustard"],
+    version: "v2.8.1.FS",
+    operator: "NATALIA",
     lead: { name: "NATALIA", role: "Logistics", color: "#c86090", icon: Shield },
-    dishes: [
+    layers: {
+      identity: {
+        text: "The kitchen begins in the stock pot and the fat lifecycle.",
+        pressurePoint: "Reduction Law & Cold Chain"
+      },
+      executionLaws: [
+        { label: "Reduction Law", text: "No high-heat reduction. No side-wall scorching." },
+        { label: "Acid Law", text: "Dressings: 3:1 fat-to-acid ratio baseline." }
+      ],
+      supplyLinks: [
+        { item: "Bones", source: "Roast Beef Bones" },
+        { item: "Oil", source: "Rapeseed cold pressed" }
+      ],
+      wmm: [
+        { label: "Mayo", value: "Gram-locked variants" },
+        { label: "Gravy", value: "20 portion equiv" }
+      ],
+      timeLaw: [
+        { label: "Sauce", value: "4-6h Simmer" },
+        { label: "Pickle", value: "2h min set" }
+      ],
+      allergenGate: { critical: ["Celery", "Mustard", "Sulphites"], protocol: "Batch label lock" },
+      safeGate: { status: "ACTIVE", requirement: "Hot hold 75°C+" },
+      forgeValidation: { status: "ACTIVE", check: "Emulsion stability" },
+      recoveryLinks: [
+        { breach: "SPLIT_EMULSION", action: "REBUILD_BATCH" }
+      ],
+      gpControl: { margin: "74%", status: "STABLE" },
+      passRejectSignals: { pass: "Integrated + Seasoned", reject: "Scorched / Split" },
+      printCard: { layout: "STATION-PREP", operator: "NATALIA" }
+    },
+    items: [
       {
         id: "p01",
         title: "Bone Reduction / Gravy Base",
@@ -958,95 +1369,192 @@ const ENGINES: Engine[] = [
         criticalNote: "Sauce GP is locked. If base supplier changes, re-cost before service.",
         reject: "Split emulsion · Unmeasured additions · Unlabelled · Past 48h",
         founderLawLocked: true
+      },
+      {
+        id: "p06",
+        title: "Red Onion Pickle",
+        tag: "PREP-006 · Acid Stabiliser",
+        signal: "Bright pink, crisp bite, balanced acid/sweet.",
+        meta: [
+          { label: "Yield", value: "20 portions", hi: true },
+          { label: "Shelf", value: "72h Chilled" },
+          { label: "Agent", value: "NATALIA" }
+        ],
+        fullSpec: {
+          "WMM": "Red onion 1kg (thin slice), Red wine vinegar 500ml, Sugar 120g, Salt 15g, Water 250ml",
+          "Time Law": "Heat liquor 5 min → pour over onions → cool → 2h minimum set.",
+          "Identity": "Acid control stabiliser. Cuts fat across system."
+        },
+        method: [
+          "Heat liquor components until sugar/salt dissolved.",
+          "Pour hot liquor over thin-sliced onions.",
+          "Cool at room temp before refrigerating.",
+          "Allow 2h minimum for color and flavor development."
+        ],
+        criticalNote: "Grey onion or soft texture indicates failure in timing or temperature.",
+        reject: "Grey onion · Soft texture · Harsh vinegar spike",
+        founderLawLocked: true
+      },
+      {
+        id: "p07",
+        title: "Burger Relish (System Lock)",
+        tag: "PREP-007 · Burger Identity",
+        signal: "Chunky, balanced, not watery.",
+        meta: [
+          { label: "Yield", value: "20 portions", hi: true },
+          { label: "Shelf", value: "48h Chilled" }
+        ],
+        fullSpec: {
+          "WMM": "Gherkins 400g, Onion 200g, Ketchup 250g, Mustard 50g, Sugar 40g, Vinegar 60ml",
+          "Time Law": "Chop fine → mix → 30 min rest.",
+          "Identity": "Acid + sugar + crunch. Burger identity layer."
+        },
+        method: [
+          "Chop gherkins and onions to uniform fine dice.",
+          "Combine with wet ingredients and sugar.",
+          "Allow flavors to marry for 30 mins before service.",
+          "Check consistency — must hold its shape."
+        ],
+        criticalNote: "Mustard allergen must be declared if used in variant.",
+        reject: "Split · Over-liquid · Dull flavour",
+        founderLawLocked: true
+      },
+      {
+        id: "p08",
+        title: "Pizza Tomato Base (Locked)",
+        tag: "PREP-008 · Pizza Anchor",
+        signal: "Bright red, fresh acidity, loose texture.",
+        meta: [
+          { label: "Yield", value: "20 pizzas", hi: true },
+          { label: "Shelf", value: "48h Chilled" },
+          { label: "Agent", value: "ASTRA" }
+        ],
+        fullSpec: {
+          "WMM": "San Marzano 2kg, Salt 20g, Olive oil 40ml",
+          "Rules": "Hand crush only. NO cooking.",
+          "Identity": "This is the pizza engine’s second anchor after dough."
+        },
+        method: [
+          "Crush San Marzano tomatoes by hand or food mill (no high speed).",
+          "Season with salt and olive oil.",
+          "Refrigerate immediately.",
+          "Check for freshness daily."
+        ],
+        criticalNote: "Cooking the sauce destroys the Neapolitan profile. Purest form only.",
+        reject: "Cooked taste · Thick paste · Oxidised colour",
+        founderLawLocked: true
       }
     ]
   },
   {
     id: "starters",
-    num: "05",
+    num: "02",
     name: "Starters\nEngine",
-    type: "First Impression · Station: Cold / Fry",
-    identity: "The customer forms their opinion in the first three minutes. There is no warm-up.",
-    pressurePoint: "Speed Without Drift",
-    controlLaws: [
-      { label: "Control Law", text: "Sharers leave together. No partial sends." },
-      { label: "Check Law", text: "Temperature, garnish and plating checked at the pass." }
-    ],
-    allergens: ["Dairy", "Gluten", "Egg", "Mollusc"],
-    lead: { name: "NATALIA", role: "Logistics", color: "#c86090", icon: Shield },
-    dishes: [
+    version: "v2.8.1.FS",
+    operator: "CLARA",
+    lead: { name: "CLARA", role: "Section Lead", color: "#4090e0", icon: Zap },
+    layers: {
+      identity: {
+        text: "The first plate defines the entire service trajectory.",
+        pressurePoint: "Service Pacing & Flow"
+      },
+      executionLaws: [
+        { label: "Entry Law", text: "No starter leaves without allergen validation." },
+        { label: "Sync Law", text: "Clear within 6–8 min or HOLD ticket." }
+      ],
+      supplyLinks: [
+        { item: "Squid", source: "Coast-Direct" },
+        { item: "Livers", source: "Farm-Fresh" }
+      ],
+      wmm: [
+        { label: "Squid", value: "120g portion" },
+        { label: "Soup", value: "250ml ladle" }
+      ],
+      timeLaw: [
+        { label: "Assembly", value: "2 min max" },
+        { label: "Fry", value: "90s peak" }
+      ],
+      allergenGate: { critical: ["Shellfish", "Gluten", "Dairy"], protocol: "Waitron-Chef double check" },
+      safeGate: { status: "ACTIVE", requirement: "Fryer 180°C recovery" },
+      forgeValidation: { status: "ACTIVE", check: "Visual drift zero" },
+      recoveryLinks: [
+        { breach: "LATE_STARTER", action: "PRIORITIZE_STATION" }
+      ],
+      gpControl: { margin: "78%", status: "STABLE" },
+      passRejectSignals: { pass: "Clean plate edge", reject: "Cold / Smeared" },
+      printCard: { layout: "STATION-LARDER", operator: "NATALIA" }
+    },
+    items: [
       {
-        id: "s01",
-        title: "Lamb Shoulder Bonbon",
-        tag: "STARTER-004 · Signature",
-        signal: "Braise transformed into crisp bite. Interior moist, exterior crisp.",
+        id: "st01",
+        title: "Tomato & Basil Bruschetta",
+        tag: "STARTER-001 · Fast Acid",
+        signal: "Crisp base, fresh top. System warm-up.",
         meta: [
-          { label: "Type", value: "Signature", hi: true },
-          { label: "WMM-20", value: "Shielded" },
-          { label: "GP", value: "79.1% (Locked)" }
+          { label: "Yield", value: "20 portions", hi: true },
+          { label: "Agent", value: "NATALIA" }
         ],
         fullSpec: {
-          "Supply": "SUPPLY-PRT-012 (Neck/Shoulder).",
-          "WMM-20": "Braise: 5kg Protein | 2L Stock | 500g Mirepoix.",
-          "Portion Gate": "45g ±3g per unit. 5 per starter portion.",
-          "Time Law": "Bake 4h (Braise) → Cool 12h → Fry 180°C 4.5 min."
+          "WMM": "Sourdough, Tomato 2kg, Basil, Olive oil.",
+          "Rules": "Toast 2 min. Tomato maceration 15 min.",
+          "Identity": "Fast acid entry. System warm-up."
         },
         method: [
-          "Braise shoulder. Cool. Pick and bind with reduced liquid.",
-          "Weigh and shape consistent balls. Crumb and chill 30 min.",
-          "Fry to order 180°C. Rack drain. Season. Send within 60 sec."
+          "Slice sourdough to 15mm uniform thickness.",
+          "Rub with garlic and toast to heavy crunch.",
+          "Top with macerated tomatoes and fresh hand-torn basil.",
+          "Finish with cold-press olive oil."
         ],
-        criticalNote: "Crumb blowout = prep/temp failure. Discard blown units.",
-        reject: "Cold centre · Blowout · Greasy · Oil pooling",
+        criticalNote: "Soggy bread indicates premature plating or failed toast depth.",
+        reject: "Soggy bread · Cold toast · Under-macerated",
         founderLawLocked: true
       },
       {
-        id: "s03",
-        title: "Pea Puree",
-        tag: "STARTER-002 · Color Lock",
-        signal: "Bright green support. Grey means overcooked or failed shock.",
+        id: "st02",
+        title: "Chicken Liver Parfait",
+        tag: "STARTER-002 · Cold Precision",
+        signal: "Smooth, rich, clean slice. Fat control.",
         meta: [
-          { label: "Batch", value: "20 portions", hi: true },
-          { label: "Standard", value: "Shock Required" },
-          { label: "Window", value: "Color Lock" }
+          { label: "Shelf", value: "48h", hi: true },
+          { label: "Agent", value: "CLAUDIA" }
         ],
         fullSpec: {
-          "Cook": "Maximum 90 sec in salted boil. Immediate ice shock.",
-          "Blend": "Blend cold with controlled butter/cream. Pass for smooth.",
-          "Color": "Vibrant green is non-negotiable. Rebuild if dull.",
-          "Hold": "65°C max hold. Color degrades on long heat."
+          "WMM": "Chicken liver 1kg, Butter 400g, Shallot, Brandy.",
+          "Rules": "Blend warm -> set 12h.",
+          "Identity": "Cold precision. Fat control."
         },
         method: [
-          "90s boil. Immediate drain and ice shock. Drain ice water.",
-          "Blend with fat while cold. Pass through fine sieve.",
-          "Verify vibrant green before service. Hold appropriately."
+          "Clean livers of all sinew (mandatory).",
+          "Sweat aromatics and flambe with brandy.",
+          "Emulsify with warm butter in high-speed blender.",
+          "Pass through chinois and set in molds under wax seal."
         ],
-        criticalNote: "Grey puree cannot be recovered. Discard and rebuild immediately.",
-        reject: "Grey/dull color · Grainy texture · Watery · Unbalanced",
+        criticalNote: "Grainy texture or split fat indicates failed emulsion temp.",
+        reject: "Grainy · Split fat · Discoloured edges",
         founderLawLocked: true
       },
       {
-        id: "s02",
-        title: "Spring Rolls",
-        tag: "STARTER-006 · Fryer",
-        signal: "Crisp wrapper, hot filling, zero pooling.",
+        id: "st03",
+        title: "Crispy Squid (Fryer Test)",
+        tag: "STARTER-003 · Pressure Point",
+        signal: "Light crisp, white interior. First pressure point.",
         meta: [
-          { label: "WMM-20", value: "Shielded", hi: true },
-          { label: "GP", value: "82.4% (Locked)" }
+          { label: "Temp", value: "180°C", hi: true },
+          { label: "Agent", value: "JEMMA" }
         ],
         fullSpec: {
-          "Supply": "SUPPLY-GRN-022 (Cabbage). SUPPLY-PRT-004 (Mince).",
-          "WMM-20": "2kg Cabbage | 1kg Mince | 20x Wrappers.",
-          "Portion Gate": "60g per roll (±5g) uniform density.",
-          "Time Law": "Cool filling 1h mandatory before rolling."
+          "Coating": "Seasoned flour / starch mix.",
+          "Time Law": "Fry 180°C -> 90 seconds max.",
+          "Identity": "Fryer test. If oil temp <170°C -> AUTO PAUSE."
         },
         method: [
-          "Cook filling. Cool fully 1h. Roll tight.",
-          "Chill rolled units until service. No condensation.",
-          "Fry 180°C until deep golden. Rack drain. Plate within 90s."
+          "Clean and score squid for maximum surface area.",
+          "Dredge in seasoned flour immediately before frying.",
+          "Flash fry at high heat for 90 seconds.",
+          "Drain and season at basket. Send in 30s."
         ],
-        criticalNote: "Wrapper burst protocol: discard immediately, reset oil if needed.",
-        reject: "Burst · Greasy · Cold filling · Pre-fried · Pale",
+        criticalNote: "Rubbery or greasy squid means oil recovery failed. Check temp.",
+        reject: "Rubber · Greasy · Pale · Over-cooked",
         founderLawLocked: true
       }
     ]
@@ -1055,114 +1563,81 @@ const ENGINES: Engine[] = [
     id: "sides",
     num: "06",
     name: "Sides\nEngine",
-    type: "Support System · Station: Fry / Prep",
-    identity: "Sides are not an afterthought. A cold chip undoes the main.",
-    pressurePoint: "Timing with Main",
-    controlLaws: [
-      { label: "Timing Law", text: "Sides leave pass with main. No main without side confirmed hot." },
-      { label: "Condition", text: "Season immediately out of oil. The oil holds the salt." }
-    ],
-    allergens: ["Dairy", "Gluten", "Sulphites"],
-    lead: { name: "CLAUDIA", role: "Technical Engr", color: "#50b890", icon: Box },
-    dishes: [
+    version: "v2.8.1.FS",
+    operator: "VITO",
+    lead: { name: "VITO", role: "Volume Support", color: "#e04040", icon: Layers },
+    layers: {
+      identity: {
+        text: "Sides are the margin engine and the plate unifier.",
+        pressurePoint: "Heat Maintenance & Portion Lock"
+      },
+      executionLaws: [
+        { label: "Portion Law", text: "Exact gram-locked portioning. No freehand scoops." },
+        { label: "Heat Law", text: "Sides must arrive hot. Minimum 65°C." }
+      ],
+      supplyLinks: [
+        { item: "Potatoes", source: "Farm-Select" },
+        { item: "Greens", source: "Garden-Link" }
+      ],
+      wmm: [
+        { label: "Chips", value: "250g portion" },
+        { label: "Slaw", value: "120g portion" }
+      ],
+      timeLaw: [
+        { label: "Assembly", value: "30s" },
+        { label: "Heat sync", value: "Concurrent with Mains" }
+      ],
+      allergenGate: { critical: ["Dairy", "Gluten"], protocol: "Standard Check" },
+      safeGate: { status: "ACTIVE", requirement: "Hot hold protocol" },
+      forgeValidation: { status: "ACTIVE", check: "Portion accuracy" },
+      recoveryLinks: [
+        { breach: "SIDE_MISSING", action: "FAST_PASS_PRIORITY" }
+      ],
+      gpControl: { margin: "82%", status: "STABLE" },
+      passRejectSignals: { pass: "Steam rising", reject: "Cold / Small portion" },
+      printCard: { layout: "STATION-SIDES", operator: "MARCO" }
+    },
+    items: [
       {
-        id: "d01",
-        title: "Triple Cooked Chips",
-        tag: "SIDE-001 · Core",
-        signal: "Staged drying is the system.",
+        id: "side01",
+        title: "Roast Potatoes",
+        tag: "SIDE-001 · Sunday Anchor",
+        signal: "Glass-crunch skin, fluffy interior.",
         meta: [
-          { label: "Standard", value: "WMM-20 Shield", hi: true },
-          { label: "GP", value: "86.1% (Locked)" },
-          { label: "Hold", value: "45 min max" }
+          { label: "Status", value: "LOCKED", hi: true },
+          { label: "Heat", value: "High" }
         ],
         fullSpec: {
-          "Supply": "SUPPLY-GRN-001 (Maris Piper).",
-          "WMM-20": "10kg Batch (Stage 1 & 2 pre-service).",
-          "Portion Gate": "250g ±10g served in paper-lined basket.",
-          "Time Law": "Blanch 12m → Dry 1h → Fry 160°C 8m → Fry 180°C 3m."
+          "Method": "Par-boil -> Ruff -> Roast in Beef Dripping.",
+          "Time": "60 min roast."
         },
         method: [
-          "Cut uniform. Blanch until tender. Steam dry fully.",
-          "Fry 1 & 2. Hold second-fried chips max 45 min.",
-          "Final fry to order 180°C. Season at basket. Send in 90s."
+          "Bicarb par-boil until shaggy.",
+          "Shake for maximum surface area fluff.",
+          "Roast in hot fat at 200°C."
         ],
-        criticalNote: "Moisture is the enemy. Chips must feel dry to touch before fry.",
-        reject: "Limp · Greasy · Unseasoned · Paper-drained",
+        criticalNote: "Must have 'glass-crunch' surface. No steam-trapping.",
+        reject: "Soggy · Pale · Cold",
         founderLawLocked: true
       },
       {
-        id: "d02",
-        title: "Cauliflower Cheese",
-        tag: "SIDE-002 · Oven Side",
-        signal: "Drain the cauliflower thoroughly. Moisture is the enemy.",
+        id: "side02",
+        title: "Seasonal Slaw",
+        tag: "SIDE-002 · Crisp Acid",
+        signal: "Crunchy, fresh, balanced acid.",
         meta: [
-          { label: "Batch", value: "20 portions", hi: true },
-          { label: "State", value: "Hot Hold" },
-          { label: "Rule", value: "Drain Law" }
+          { label: "Scale", value: "Batch", hi: true }
         ],
         fullSpec: {
-          "Cauliflower": "Cook to just tender. Drain min 5 min. Steam dry.",
-          "Sauce": "Roux base. Do not boil after cheese addition (splits).",
-          "Bake": "200°C until golden top and bubbling edges.",
-          "Hold": "Bain-marie 75°C+. No direct heat."
+          "Method": "Fine shred -> 3:1 Mayo:Acid fold."
         },
         method: [
-          "Cook florets. Drain 5 min mandatory. Steam dry residual wet.",
-          "Combine with cheese sauce. Top with extra cheese.",
-          "Bake until golden. Transfer to bain-marie hold."
+          "Shred cabbage, carrot, onion fine.",
+          "Fold in locked dressing spec.",
+          "Chill 1h before service."
         ],
-        criticalNote: "If sauce splits: discard. Split sauce is unserviceable on the plate.",
-        reject: "Watery base · Split sauce · Mushy texture · Pale top",
-        founderLawLocked: true
-      },
-      {
-        id: "d03",
-        title: "Roast Potatoes Duck Fat",
-        tag: "SIDE-004 · Duck Fat Roast",
-        signal: "Rough edges build the crust. Parboil/Steam are not optional.",
-        meta: [
-          { label: "Fat", value: "Duck Fat", hi: true },
-          { label: "Roast", value: "220°C" },
-          { label: "Prep", value: "Rough Edge Law" }
-        ],
-        fullSpec: {
-          "Parboil": "8–10 min until edges soften. Steam dry 5 min.",
-          "Edges": "Rough by shaking in dry pot. Pre-roast structure.",
-          "Roast": "220°C. Smoking fat. Turn every 20 min. 45–60 min total.",
-          "Garlic Law": "Add rosemary/garlic final 15 min only. Burnt = ruined."
-        },
-        method: [
-          "Parboil then steam dry. Rough edges by gentle shake.",
-          "Heat duck fat smoking. Coat potatoes. Roast at 220°C.",
-          "Add aromatics final 15 min. Roast to deep gold crisp."
-        ],
-        criticalNote: "Garlic added too early turns bitter and ruins the entire fat batch.",
-        reject: "Waxy dense · Greasy · Cold · Burnt garlic · No crust",
-        founderLawLocked: true
-      },
-      {
-        id: "d04",
-        title: "Tenderstem / Greens",
-        tag: "SIDE-006 · Fast Side",
-        signal: "Bright green, hot, slight bite. Grey is overcooked.",
-        meta: [
-          { label: "Window", value: "Fast Send", hi: true },
-          { label: "Prep", value: "Blanch + Shock" },
-          { label: "Reheat", value: "High Heat Saut" }
-        ],
-        fullSpec: {
-          "Prep": "90s blanch. Ice shock to lock color. Drain.",
-          "Reheat": "Hot pan. Butter/oil. 60–90 sec max. No cover.",
-          "Timing": "Plate within 60s window of main.",
-          "Pass Signal": "Vibrant green, glistening, hot through."
-        },
-        method: [
-          "Pre-blanch and shock. Hold chilled.",
-          "To order: Sauté high heat 60-90s with butter. Season in pan.",
-          "No pre-plating. Send within timing window of main."
-        ],
-        criticalNote: "If color turns grey: discard. Bright green at pass is law.",
-        reject: "Grey color · Limp · Cold · Covered during reheat",
+        criticalNote: "Dress to order or 1h max before to prevent water release.",
+        reject: "Watery · Saturated · Dull",
         founderLawLocked: true
       }
     ]
@@ -1171,39 +1646,65 @@ const ENGINES: Engine[] = [
     id: "sunday",
     num: "09",
     name: "Sunday Roast\nEngine",
-    type: "Weekly Event · Station: Hot / Pass",
-    identity: "The Sunday Roast is a logistical operation. Timing, temperature, and plate heat must be synchronized for every covers surge.",
-    pressurePoint: "Peak Volume Synchronization",
-    controlLaws: [
-      { label: "Rest Law", text: "Beef must rest 45 mins min. No slicing under pressure." },
-      { label: "Heat Law", text: "Plates 60°C+. Gravy 85°C+. Cold roasts are failure." }
-    ],
-    allergens: ["Gluten", "Dairy", "Sulfites"],
-    lead: { name: "HELIOS", role: "Volume Pulse", color: "#fbb140", icon: Clock },
-    dishes: [
+    version: "v2.8.1.FS",
+    operator: "HELIOS",
+    lead: { name: "HELIOS", role: "Sun Engine", color: "#fbb140", icon: SunMedium },
+    layers: {
+      identity: {
+        text: "Sunday is an industrial ritual of heat and timing.",
+        pressurePoint: "Peak Load @ 14:00 (The Wall)"
+      },
+      executionLaws: [
+        { label: "Prep Law", text: "Zero prep during service." },
+        { label: "Heat Law", text: "Plates must be scalding." }
+      ],
+      supplyLinks: [
+        { item: "Beef", source: "Aged-Select" },
+        { item: "Potatoes", source: "Maris-Piper-Anchor" }
+      ],
+      wmm: [
+        { label: "Beef", value: "200g portion" },
+        { label: "Yorkshire", value: "4-inch min" }
+      ],
+      timeLaw: [
+        { label: "Roast", value: "High-heat surge" },
+        { label: "Rest", value: "20 min min" }
+      ],
+      allergenGate: { critical: ["Gluten", "Dairy"], protocol: "Sunday Shield" },
+      safeGate: { status: "ACTIVE", requirement: "Internal beef 52°C Rare" },
+      forgeValidation: { status: "ACTIVE", check: "Texture consistency" },
+      recoveryLinks: [
+        { breach: "YORKSHIRE_FAIL", action: "REFIRE_BATCH" }
+      ],
+      gpControl: { margin: "72%", status: "VOLUME_DEPENDENT" },
+      passRejectSignals: { pass: "Steam rising + Glossy gravy", reject: "Cold / Flat Yorkie" },
+      printCard: { layout: "STATION-ROAST", operator: "HELIOS" }
+    },
+    items: [
       {
         id: "sun01",
-        title: "35 Day Aged Beef Roast",
-        tag: "SUNDAY-001 · Sunday Hero",
-        signal: "Pink rim to rim. No gray bands. Salt-crusted exterior.",
+        title: "The Ultimate Roast Potatoes",
+        tag: "STATION: ROAST · Volume: High",
+        signal: "Glass-Crunch Gold",
         meta: [
-          { label: "Price", value: "£22.00", hi: true },
-          { label: "Target", value: "Pink (Med-Rare)" },
-          { label: "Rest", value: "45 min" }
+          { label: "Status", value: "Live v1", hi: true },
+          { label: "Texture", value: "Fluffed" }
         ],
         fullSpec: {
-          "Joint": "Supplied trimmed. Tie every 2 inches.",
-          "Searing": "Hard sear on all surface area before slow roast.",
-          "Temp": "Pull at 46°C. Carryover to 52°C during 45 min rest.",
-          "Slicing": "Across grain. 6mm uniform thickness."
+          "Variety": "Maris Piper (High Starch)",
+          "Prep": "Peel, quarter, par-boil in salted water with pinch of bicarb until edges are 'shaggy'.",
+          "Fat": "Beef Dripping (Deep flavour) or Vegetable Oil (Crispy shell).",
+          "Roast": "Pre-heated trays @ 200°C. 45-60 mins. Turn every 15 mins.",
+          "Finish": "Maldon salt + Rosemary (Fresh)"
         },
         method: [
-          "Temper beef for 2 hours before oven entry.",
-          "Season with heavy sea salt and cracked pepper.",
-          "Rest on heated rack, lightly tented."
+          "Steam dry for 10 mins post-drain to maximize crunch.",
+          "Shake aggressively in colander to fluff the surface.",
+          "Roast until auditory 'glass-crunch' is achieved.",
+          "Hold in dry-heat cupboard, never covered (will go soft)."
         ],
-        criticalNote: "If the beef is overcooked, there is no remedy. Pull early.",
-        reject: "Well-done center · No rest bleed · Gray meat · Cold gravy",
+        criticalNote: "Oil must be shimmering before potatoes enter tray.",
+        reject: "Soft skin · Pale colour · Gray/Waxy center",
         founderLawLocked: true
       }
     ]
@@ -1211,20 +1712,42 @@ const ENGINES: Engine[] = [
   {
     id: "allergen",
     num: "11",
-    name: "Allergen\nEnforcement Layer",
-    type: "Supplier Gate · Auto-Block · Legal Shield",
-    identity: "\"No supplier declaration = no service. Allergens are not labels — they are hard gates.\"",
-    pressurePoint: "Missing Spec Sheet = BLOCKED",
-    controlLaws: [
-      { label: "Supplier Gate Law", text: "Every incoming ingredient must have current supplier allergen spec sheet attached before receiving acceptance." },
-      { label: "Substitution Law", text: "Any substitution triggers full allergen re-check. Unapproved change = BLOCKED." }
-    ],
-    allergens: ["ALLERGEN SHIELD ACTIVE"],
-    lead: { name: "LOGOS", role: "Compliance Brain", color: "#a3854d", icon: ShieldCheck },
-    dishes: [
+    name: "Allergen\nEngine",
+    version: "v2.8.1.FS",
+    operator: "SAFE",
+    lead: { name: "LOGOS", role: "Compliance", color: "#a3854d", icon: ShieldCheck },
+    layers: {
+      identity: {
+        text: "No supplier declaration = no service.",
+        pressurePoint: "Missing Spec Sheet = BLOCKED"
+      },
+      executionLaws: [
+        { label: "Supplier Gate", text: "Every item must have a spec sheet." },
+        { label: "Substitution Law", text: "Substitutions trigger full re-check." }
+      ],
+      supplyLinks: [
+        { item: "Data", source: "Logos Vault" }
+      ],
+      wmm: [
+        { label: "Audit", value: "Daily check" }
+      ],
+      timeLaw: [
+        { label: "Briefing", value: "Pre-service" }
+      ],
+      allergenGate: { critical: ["ALLERGEN SHIELD ACTIVE"], protocol: "Binary Block" },
+      safeGate: { status: "ACTIVE", requirement: "Digital sign-off" },
+      forgeValidation: { status: "ACTIVE", check: "Label vs Spec" },
+      recoveryLinks: [
+        { breach: "MISSING_SPEC", action: "BLOCK_ITEM" }
+      ],
+      gpControl: { margin: "N/A", status: "COMPLIANCE" },
+      passRejectSignals: { pass: "Verified Label", reject: "No Documentation" },
+      printCard: { layout: "STATION-OFFICE", operator: "LOGOS" }
+    },
+    items: [
       {
         id: "all01",
-        title: "ALL-001 Allergen Enforcement Protocol",
+        title: "Allergen Enforcement Protocol",
         tag: "SUPPLY-LCK · All Items",
         signal: "Supplier Declaration Gate",
         meta: [
@@ -1233,68 +1756,15 @@ const ENGINES: Engine[] = [
         ],
         fullSpec: {
           "Rule": "Every incoming ingredient must have current supplier allergen spec sheet attached.",
-          "Status Fields": "CONFIRMED | PENDING AUDIT | BLOCKED",
-          "Auto-Reject": "No spec sheet = BLOCKED at goods-in. Item cannot enter kitchen.",
-          "Sub Rule": "Any substitution triggers full allergen re-check. Unapproved = BLOCKED.",
-          "FORGE Interface": "Missing allergen data = SERVICE BLOCKED for that dish."
+          "Status Fields": "CONFIRMED | PENDING AUDIT | BLOCKED"
         },
         method: [
           "Check supplier spec folder against daily delivery.",
-          "Cross-reference every ingredient in active WMM batch.",
-          "Flag missing declarations to FORGE Brain immediately.",
-          "Block service on any unverified dish until data is verified."
+          "Cross-reference every ingredient.",
+          "Flag missing declarations."
         ],
-        criticalNote: "No supplier declaration = no service. Legal shield is binary.",
-        reject: "Missing Spec Sheet · Unverified Sub · Stale Data",
-        founderLawLocked: true
-      },
-      {
-        id: "all02",
-        title: "ALL-002 Daily Allergen Audit",
-        tag: "PRE-SERVICE · FOH Gate",
-        signal: "Communication of Truth",
-        meta: [
-          { label: "Briefing", value: "Mandatory", hi: true },
-          { label: "Matrix", value: "Auto-Generated" }
-        ],
-        fullSpec: {
-          "Protocol": "FOH briefing must include updated allergen matrix from Supply Engine.",
-          "Removal": "Any BLOCKED item removed from service before doors open.",
-          "Verdict": "All active dishes must show CONFIRMED status.",
-          "Verification": "Weekly spot check of supplier declarations vs physical label."
-        },
-        method: [
-          "Generate daily allergen matrix from Bible data.",
-          "Brief FOH on changes or BLOCKED items.",
-          "Post physically verified matrix at service pass.",
-          "Update digital menu systems via FORGE link."
-        ],
-        criticalNote: "Allergens are not labels — they are hard gates.",
-        reject: "Briefing Skip · Outdated Matrix · Missing Label Audit",
-        founderLawLocked: true
-      },
-      {
-        id: "all03",
-        title: "ALL-003 Substitution Lockdown",
-        tag: "SUPPLY-LCK · Emergency Link",
-        signal: "Technical Zero-Trust Policy",
-        meta: [
-          { label: "Override", value: "DISABLED", hi: true },
-          { label: "Recalculate", value: "Mandatory" }
-        ],
-        fullSpec: {
-          "Rule": "Any ingredient substitution requires matching allergen certificate AND technical spec audit.",
-          "Barrier": "If no cert exists for sub, original item is DELETED from POS until source is secured.",
-          "Verification": "LOGOS must electronically sign off on any change to the 'Safe List'."
-        },
-        method: [
-          "Scan new supplier spec for hidden cross-contamination.",
-          "Compare against existing POS allergen flags.",
-          "Block item if technical specs don't match 1:1.",
-          "Issue 'Red Alert' to FOH on any recipe drift."
-        ],
-        criticalNote: "We do not guess. We verify or we block.",
-        reject: "Unverified origin · Hidden derivatives · LOGOS Lock-Out",
+        criticalNote: "No supplier declaration = no service.",
+        reject: "Missing Spec Sheet · Unverified Sub",
         founderLawLocked: true
       }
     ]
@@ -1302,136 +1772,58 @@ const ENGINES: Engine[] = [
   {
     id: "forge-brain",
     num: "10",
-    name: "FORGE Brain\nv2.0",
-    type: "Strategic Control · Drift Prediction · Recipe Completeness",
-    identity: "The Bible executes. The Brain evaluates, predicts, and protects. No card is trusted until its data is complete.",
-    pressurePoint: "Missing Data · GP Drift · Service Readiness",
-    controlLaws: [
-      { label: "Completeness Scan", text: "Recipe Card Audit: WMM-6, WMM-20, Time Law, Portion Gate, Supply Link, Allergen Status, Validation, Reject Rule." },
-      { label: "GP Drift Monitor", text: "True GP vs target and hard floor. Any supplier price movement triggers recalculation. PASS/WARNING/FAIL/BLOCK." },
-      { label: "Service Readiness", text: "READY · WARNING · FAIL · BLOCKED per engine. Any unsafe allergen or failed validation blocks the card." }
-    ],
-    allergens: [],
+    name: "FORGE\nBrain",
+    version: "v2.8.0.RECOVERY",
+    operator: "CORE",
     lead: { name: "CORE", role: "Strategic Lead", color: "#ffffff", icon: ShieldCheck },
-    dishes: [
+    layers: {
+      identity: {
+        text: "The Brain evaluates, predicts, and protects.",
+        pressurePoint: "Drift Prediction"
+      },
+      executionLaws: [
+        { label: "Completeness", text: "Recipe Card Audit mandatory." },
+        { label: "GP Monitor", text: "Recalculate on price shift." }
+      ],
+      supplyLinks: [
+        { item: "Intelligence", source: "System-Wide" }
+      ],
+      wmm: [
+        { label: "Integrity", value: "% Score" }
+      ],
+      timeLaw: [
+        { label: "Decision", value: "<100ms" }
+      ],
+      allergenGate: { critical: ["DATA_MISSING"], protocol: "System Pause" },
+      safeGate: { status: "ACTIVE", requirement: "Full card validation" },
+      forgeValidation: { status: "ACTIVE", check: "All layers present" },
+      recoveryLinks: [
+        { breach: "DRIFT_DETECTED", action: "TRIGGER_RECOVERY" }
+      ],
+      gpControl: { margin: "OVERALL", status: "STABLE" },
+      passRejectSignals: { pass: "Integrity >90", reject: "Integrity <85" },
+      printCard: { layout: "SYSTEM-DASHBOARD", operator: "CORE" }
+    },
+    items: [
       {
         id: "fb01",
-        title: "BRAIN-001 Recipe Completeness Scan",
-        tag: "Audit · All Cards",
-        signal: "Recipe Card Integrity Audit",
+        title: "Recovery Path Engine",
+        tag: "ADAPTIVE-COMMAND · Locked",
+        signal: "System Stabilization Command",
         meta: [
-          { label: "Audit Level", value: "Strategic" },
-          { label: "Status", value: "Online" }
+          { label: "Logic", value: "v2.8.0", hi: true },
+          { label: "Channel", value: "Cloud Recovery" }
         ],
         fullSpec: {
-          "Checks": "WMM-6 · WMM-20 · Time Law · Portion Gate · Supply Link · Allergen Status · Validation · Reject Rule",
-          "Fail Condition": "Any missing WMM-20 or Portion Gate returns FAIL. Missing allergen sheet returns BLOCKED.",
-          "Target": "100% Completeness across all service engines."
+          "Rule": "Every BREACH event MUST generate a RECOVERY signal."
         },
         method: [
-          "Scan every card for mandatory data fields.",
-          "Verify WMM-20 shielding level.",
-          "Flag missing Portion Gates or Time Laws.",
-          "Issue Completeness Verdict (READY/FAIL)."
+          "Evaluate breach source.",
+          "Calculate downstream impact.",
+          "Publish recovery commands."
         ],
-        criticalNote: "No card is service-ready without full data validation.",
-        reject: "Missing WMM-20 · No Portion Gate · Stale Validation",
-        founderLawLocked: true
-      },
-      {
-        id: "fb02",
-        title: "BRAIN-002 GP Drift Monitor",
-        tag: "Economic Control",
-        signal: "Real-time Margin Protection",
-        meta: [
-          { label: "Monitor", value: "Continuous" },
-          { label: "Precision", value: "0.1%" }
-        ],
-        fullSpec: {
-          "Checks": "True GP vs target GP and hard floor. Any supplier price movement triggers recalculation.",
-          "Verdict Logic": "PASS above target · WARNING near floor · FAIL below target · BLOCK below hard floor.",
-          "Action": "Triggers immediate supply engine review on breach."
-        },
-        method: [
-          "Poll Supply Engine for price movements.",
-          "Recalculate True GP for all linked dishes.",
-          "Compare against Hard Floor constants.",
-          "Alert on drift patterns before service."
-        ],
-        criticalNote: "Economic drift is the silent system killer.",
-        reject: "Target Breach · Hard Floor Violation · Dirty Cost Data",
-        founderLawLocked: true
-      },
-      {
-        id: "fb03",
-        title: "BRAIN-003 Supply Dependency Map",
-        tag: "Supplier Logic",
-        signal: "Traceable Supply Chain",
-        meta: [
-          { label: "Trace", value: "Full" },
-          { label: "Linkage", value: "100%" }
-        ],
-        fullSpec: {
-          "Links": "Every dish maps to supplier IDs, pack sizes, cost bands, allergen sheets and substitution rules.",
-          "Fail Logic": "Descriptive ingredients without supplier ID return WARNING. High-risk items return FAIL.",
-          "Compliance": "Missing allergen sheet = BLOCKED status."
-        },
-        method: [
-          "Verify every ingredient has an active SUPPLY-ID.",
-          "Check pack size calibration vs dish yield.",
-          "Audit allergen sheet presence and expiry.",
-          "Link to substitution logic for seasonal drift."
-        ],
-        criticalNote: "Descriptive ingredients are the root of all drift.",
-        reject: "No Supply ID · Missing Allergen Sheet · Scale Mismatch",
-        founderLawLocked: true
-      },
-      {
-        id: "fb04",
-        title: "BRAIN-004 Service Readiness Verdict",
-        tag: "Pre-Service",
-        signal: "Final Pass/Fail Gate",
-        meta: [
-          { label: "Window", value: "Pre-Service" },
-          { label: "Authority", value: "Absolute" }
-        ],
-        fullSpec: {
-          "Outputs": "READY · WARNING · FAIL · BLOCKED per engine before service.",
-          "Blocking": "Any unsafe allergen, failed validation, missing key WMM, or failed temperature control blocks the card.",
-          "Recovery": "Card cannot be served until block is cleared by data entry."
-        },
-        method: [
-          "Aggregate logic from modules 001-003.",
-          "Check pre-service validation logs.",
-          "Verify Time Law / Temperature Gate compliance.",
-          "Output Engine Readiness Dashboard."
-        ],
-        criticalNote: "Safety and GP are the two non-negotiable gates.",
-        reject: "Validation Failed · Unsafe Prep · Blocked Engine",
-        founderLawLocked: true
-      },
-      {
-        id: "fb05",
-        title: "BRAIN-005 Next Failure Prediction",
-        tag: "Weak Point Scan",
-        signal: "Proactive Audit Logic",
-        meta: [
-          { label: "Mode", value: "Predictive" },
-          { label: "Horizon", value: "7 Days" }
-        ],
-        fullSpec: {
-          "Predicts": "Missing WMM, stale supplier cost, GP compression, validation gaps, over-portion risk, prep timing overload.",
-          "Actionable": "Returns next mandatory build or audit target before new expansion is allowed.",
-          "Governance": "Expansion blocked if prediction highlights critical integrity gaps."
-        },
-        method: [
-          "Identify data decay in validation dates.",
-          "Analyze prep list vs volume predictions.",
-          "Spot GP trends heading toward floor.",
-          "Rank the next 3 priority system fixes."
-        ],
-        criticalNote: "A system that doesn't fix itself eventually fails.",
-        reject: "Stale Audit · Ignored Warning · System Decay",
+        criticalNote: "Brain must evaluate predicted drift vs actual.",
+        reject: "Vague Command · No Recovery Found",
         founderLawLocked: true
       }
     ]
@@ -1455,44 +1847,6 @@ const AGENTS = [
 
 // --- Components ---
 
-function CustomCursor() {
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [hover, setHover] = useState(false);
-
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
-    const handleOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      setHover(window.getComputedStyle(target).cursor === 'pointer');
-    };
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseover', handleOver);
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseover', handleOver);
-    };
-  }, []);
-
-  return (
-    <div className="hidden md:block pointer-events-none fixed inset-0 z-[2000] no-print">
-      <motion.div
-        animate={{ x: pos.x - 3, y: pos.y - 3 }}
-        transition={{ type: "spring", damping: 30, stiffness: 400, mass: 0.5 }}
-        className="w-1.5 h-1.5 bg-fellini-accent rounded-full fixed"
-      />
-      <motion.div
-        animate={{ 
-          x: pos.x - 14, 
-          y: pos.y - 14,
-          scale: hover ? 1.5 : 1,
-          borderColor: hover ? 'rgba(163, 133, 77, 0.6)' : 'rgba(163, 133, 77, 0.3)'
-        }}
-        transition={{ type: "spring", damping: 20, stiffness: 250, mass: 0.8 }}
-        className="w-7 h-7 border rounded-full fixed"
-      />
-    </div>
-  );
-}
 
 
 // --- Components ---
@@ -1890,7 +2244,7 @@ function DishCard({ dish, onSelect }: { dish: Dish, onSelect: (dish: Dish) => vo
                 <span class="reject-text">${dish.reject}</span>
               </div>
 
-              <div class="footer">RODZ 2026 // GALYONS FELLINI MASTER BIBLE // v2.7.2.FS</div>
+              <div class="footer">RODZ 2026 // GALYONS FELLINI MASTER BIBLE // v2.8.1.FS</div>
             </div>
           </body>
         </html>
@@ -2023,7 +2377,7 @@ function AgentHUD({ lead }: { lead: Engine["lead"] }) {
   return (
     <motion.div 
       whileHover={{ scale: 1.05, borderColor: lead.color }}
-      className="flex items-center gap-5 p-5 bg-white border border-fellini-rule min-w-[280px] relative transition-all duration-300 group cursor-help rounded-xl shadow-sm"
+      className="flex items-center gap-5 p-5 bg-white border border-fellini-rule min-w-[280px] relative transition-all duration-300 group rounded-xl shadow-sm"
     >
       <div 
         className="absolute left-0 top-0 bottom-0 w-0.5 transition-all group-hover:w-1" 
@@ -2080,7 +2434,7 @@ function AgentTabs({ activeAgent, onSelect }: { activeAgent: string, onSelect: (
 
 export default function App() {
   const [isEntered, setIsEntered] = useState(false);
-  const [activeSection, setActiveSection] = useState("supply");
+  const [activeSegment, setActiveSegment] = useState("supply");
   const [activeAgent, setActiveAgent] = useState("LOGOS");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
@@ -2090,37 +2444,11 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const scrollToSection = (id: string, agentName?: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      setActiveSection(id);
-      if (agentName) setActiveAgent(agentName);
-    }
+  const selectEngine = (id: string, agentName?: string) => {
+    setActiveSegment(id);
+    if (agentName) setActiveAgent(agentName);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  // Sync active agent based on scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          setActiveSection(id);
-          const engine = ENGINES.find(e => e.id === id);
-          if (engine) setActiveAgent(engine.lead.name);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    if (isEntered) {
-      ENGINES.forEach(e => {
-        const el = document.getElementById(e.id);
-        if (el) observer.observe(el);
-      });
-    }
-
-    return () => observer.disconnect();
-  }, [isEntered]);
 
   if (!isEntered) {
     return (
@@ -2136,14 +2464,14 @@ export default function App() {
             GALYONS — RODZ 2026 SYSTEM KERNEL
           </span>
           <h1 className="font-sans text-6xl md:text-8xl font-bold tracking-tight text-fellini-black uppercase leading-tight mb-6">
-            FELLINI MASTER BIBLE v2.7.2
+            FELLINI MASTER BIBLE v2.8.1
           </h1>
           <div className="font-mono text-[11px] text-fellini-accent mb-12 tracking-[0.3em]">
-            v2.7.2 · Allergen Enforcement Layer v1.0 · Integrity Score: 93/100
+            v2.8.1 · Memory Engine · Integrity Score: 100/100
           </div>
           <button 
             onClick={() => setIsEntered(true)}
-            className="group relative font-sans text-[12px] font-semibold tracking-[0.3em] text-white uppercase bg-fellini-black px-16 py-5 hover:scale-105 transition-all cursor-none rounded-full shadow-lg"
+            className="group relative font-sans text-[12px] font-semibold tracking-[0.3em] text-white uppercase bg-fellini-black px-16 py-5 hover:scale-105 transition-all rounded-full shadow-lg"
           >
             <span className="relative z-10">Initialize Bible</span>
             <motion.div 
@@ -2158,8 +2486,7 @@ export default function App() {
   }
 
   return (
-    <div className="bg-fellini-bg min-h-screen w-full overflow-x-hidden relative selection:bg-fellini-accent/30 font-sans md:cursor-none">
-      <CustomCursor />
+    <div className="bg-fellini-bg min-h-screen w-full overflow-x-hidden relative selection:bg-fellini-accent/30 font-sans">
       <div className="scanline-overlay pointer-events-none fixed inset-0 z-[100] no-print opacity-10" />
       
       {/* HUD Header */}
@@ -2175,7 +2502,7 @@ export default function App() {
         </div>
         <div className="flex items-center gap-8 font-mono text-[9px] tracking-[0.25em] text-fellini-ghost uppercase hidden lg:flex">
           <div className="flex items-center gap-4 border border-fellini-rule px-4 py-1.5 bg-fellini-accent/5">
-             <span className="text-fellini-accent opacity-50">Bible:</span> v2.7.2.FS
+             <span className="text-fellini-accent opacity-50">Bible:</span> v2.8.1.FS
           </div>
           <div className="flex items-center gap-2">
             <Activity size={10} className="text-fellini-green" />
@@ -2185,19 +2512,21 @@ export default function App() {
       </header>
 
       {/* Agent Nav Tabs */}
-      <AgentTabs activeAgent={activeAgent} onSelect={scrollToSection} />
+      <AgentTabs activeAgent={activeAgent} onSelect={selectEngine} />
+      
+      <RecoveryCommandCenter />
 
       {/* Floating Sidebar Nav */}
       <nav className="fixed left-12 top-1/2 -translate-y-1/2 flex flex-col gap-10 z-[90] hidden xl:flex no-print">
         {ENGINES.map((e) => (
           <div key={e.id}>
             <button
-              onClick={() => scrollToSection(e.id)}
+              onClick={() => selectEngine(e.id, e.lead.name)}
               className="group flex flex-col items-start gap-2 relative pl-6"
             >
-              <div className={`absolute left-0 top-0 bottom-0 w-0.5 transition-all ${activeSection === e.id ? 'bg-fellini-accent scale-y-150' : 'bg-fellini-rule scale-y-100'}`} />
+              <div className={`absolute left-0 top-0 bottom-0 w-0.5 transition-all ${activeSegment === e.id ? 'bg-fellini-accent scale-y-150' : 'bg-fellini-rule scale-y-100'}`} />
               <div className="flex items-center gap-2">
-                 <span className={`font-mono text-[9px] tracking-[0.3em] uppercase transition-all ${activeSection === e.id ? 'text-fellini-black translate-x-2 font-bold' : 'text-fellini-ghost group-hover:text-fellini-black'}`}>
+                 <span className={`font-mono text-[9px] tracking-[0.3em] uppercase transition-all ${activeSegment === e.id ? 'text-fellini-black translate-x-2 font-bold' : 'text-fellini-ghost group-hover:text-fellini-black'}`}>
                   {e.num} // {e.id}
                 </span>
               </div>
@@ -2207,94 +2536,94 @@ export default function App() {
       </nav>
 
       <main className="data-grid-bg">
-        {ENGINES.map((engine) => (
-          <section
-            key={engine.id}
-            id={engine.id}
-            className="min-h-screen grid grid-cols-1 lg:grid-cols-2 border-b border-fellini-rule relative scroll-mt-32 md:scroll-mt-40"
-          >
-            {/* Intel Side */}
-            <div className="p-6 pt-32 md:p-24 lg:p-32 flex flex-col justify-center bg-white/50 backdrop-blur-md relative overflow-hidden ring-1 ring-fellini-rule/10">
-              <motion.div 
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="relative z-10"
-              >
-                <div className="font-mono text-[10px] tracking-[0.5em] text-fellini-accent mb-12 flex items-center gap-6">
-                  {engine.num} · ARCHIVE CLASSIFIED
-                  <div className="h-[1.5px] grow bg-gradient-to-r from-fellini-accent/40 to-transparent" />
-                </div>
-                
-                <h2 className="font-sans text-5xl md:text-7xl lg:text-8xl text-fellini-black mb-6 leading-[0.9] tracking-tight whitespace-pre-line uppercase font-bold">
-                  {engine.name}
-                </h2>
-                
-                <div className="font-mono text-sm text-fellini-ghost mb-16 tracking-[0.25em] flex items-center gap-4">
-                  <div className="w-1.5 h-1.5 rounded-full bg-fellini-accent" />
-                  {engine.type}
-                </div>
+        {(() => {
+          const engine = ENGINES.find(e => e.id === activeSegment) || ENGINES[0];
+          return (
+            <motion.section
+              key={engine.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="min-h-screen grid grid-cols-1 lg:grid-cols-2 border-b border-fellini-rule relative pt-20"
+            >
+              {/* Intel Side */}
+              <div className="p-6 pt-32 md:p-24 lg:p-32 flex flex-col justify-center bg-white/50 backdrop-blur-md relative overflow-hidden ring-1 ring-fellini-rule/10">
+                <div className="relative z-10">
+                  <div className="font-mono text-[10px] tracking-[0.5em] text-fellini-accent mb-12 flex items-center gap-6">
+                    {engine.num} · ARCHIVE CLASSIFIED
+                    <div className="h-[1.5px] grow bg-gradient-to-r from-fellini-accent/40 to-transparent" />
+                  </div>
+                  
+                  <h2 className="font-sans text-5xl md:text-7xl lg:text-8xl text-fellini-black mb-6 leading-[0.9] tracking-tight whitespace-pre-line uppercase font-bold">
+                    {engine.name}
+                  </h2>
+                  
+                  <div className="font-mono text-sm text-fellini-ghost mb-16 tracking-[0.25em] flex items-center gap-4">
+                    <div className="w-1.5 h-1.5 rounded-full bg-fellini-accent" />
+                    {engine.version}
+                  </div>
 
-                <div className="border-l-2 md:border-l-4 border-fellini-accent/20 pl-6 md:pl-12 py-3 mb-10 md:mb-16 max-w-xl">
-                  <p className="font-serif italic text-lg md:text-2xl text-fellini-cream leading-relaxed font-light">
-                    "{engine.identity}"
-                  </p>
-                </div>
+                  <div className="border-l-2 md:border-l-4 border-fellini-accent/20 pl-6 md:pl-12 py-3 mb-10 md:mb-16 max-w-xl">
+                    <p className="font-serif italic text-lg md:text-2xl text-fellini-cream leading-relaxed font-light">
+                      "{engine.layers.identity.text}"
+                    </p>
+                  </div>
 
-                <div className="grid grid-cols-1 gap-4 mb-10 md:mb-16">
-                  <div className="border border-fellini-rule bg-white shadow-sm rounded-xl p-6 md:p-10 relative overflow-hidden group">
-                    <Orbit className="absolute -right-8 -bottom-8 text-fellini-accent/5 group-hover:text-fellini-accent/10 transition-all duration-1000 rotate-12" size={200} />
-                    <div className="font-mono text-[10px] tracking-[0.4em] text-fellini-accent uppercase mb-8 flex items-center gap-2">
-                       <Shield size={12} /> Execution Control Laws
-                    </div>
-                    <div className="space-y-6 relative z-10">
-                      {engine.controlLaws.map((law, idx) => (
-                        <div key={idx} className="flex gap-6">
-                          <div className="font-mono text-[10px] text-fellini-ghost mt-1 shrink-0">L.{idx + 1}</div>
-                          <p className="font-sans italic text-base text-fellini-ghost leading-snug">
-                             <span className="text-fellini-black not-italic font-mono text-[10px] tracking-widest uppercase mr-2">{law.label}:</span>
-                             {law.text}
-                          </p>
-                        </div>
-                      ))}
+                  <div className="grid grid-cols-1 gap-4 mb-10 md:mb-16">
+                    <div className="border border-fellini-rule bg-white shadow-sm rounded-xl p-6 md:p-10 relative overflow-hidden group">
+                      <Orbit className="absolute -right-8 -bottom-8 text-fellini-accent/5 group-hover:text-fellini-accent/10 transition-all duration-1000 rotate-12" size={200} />
+                      <div className="font-mono text-[10px] tracking-[0.4em] text-fellini-accent uppercase mb-8 flex items-center gap-2">
+                         <Shield size={12} /> Execution Control Laws
+                      </div>
+                      <div className="space-y-6 relative z-10">
+                        {engine.layers.executionLaws.map((law, idx) => (
+                          <div key={idx} className="flex gap-6">
+                            <div className="font-mono text-[10px] text-fellini-ghost mt-1 shrink-0">L.{idx + 1}</div>
+                            <p className="font-sans italic text-base text-fellini-ghost leading-snug">
+                               <span className="text-fellini-black not-italic font-mono text-[10px] tracking-widest uppercase mr-2">{law.label}:</span>
+                               {law.text}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Lead Operator */}
-                <AgentHUD lead={engine.lead} />
-              </motion.div>
-              
-              {/* Background Ghost ID */}
-              <div className="absolute right-0 bottom-12 font-sc text-[22vw] text-white/[0.015] pointer-events-none select-none z-0 leading-none">
-                {engine.num}
-              </div>
-            </div>
-
-            {/* Execution / Dish Cards Side */}
-            <div className="p-6 md:p-16 lg:p-20 bg-white/50 backdrop-blur-sm border-l border-fellini-rule lg:overflow-y-auto lg:max-h-screen pt-20 lg:pt-20 shadow-inner">
-              <div className="max-w-2xl mx-auto">
-                <div className="flex justify-between items-center mb-8 md:mb-12 border-b border-fellini-rule pb-4">
-                   <div className="font-mono text-[10px] tracking-[0.4em] text-fellini-ghost uppercase font-bold">
-                    System Cards // Founder Law
-                  </div>
-                  <div className="flex gap-2">
-                    <CheckCircle2 size={12} className="text-fellini-green" />
-                    <span className="font-mono text-[8px] text-fellini-green uppercase tracking-widest">Verified 2026.FS</span>
-                  </div>
+                  <AgentHUD lead={engine.lead} />
                 </div>
                 
-                <div className="space-y-4">
-                  {engine.dishes.map((dish) => (
-                    <div key={dish.id}>
-                      <DishCard dish={dish} onSelect={setSelectedDish} />
-                    </div>
-                  ))}
+                {/* Background Ghost ID */}
+                <div className="absolute right-0 bottom-12 font-sc text-[22vw] text-white/[0.015] pointer-events-none select-none z-0 leading-none">
+                  {engine.num}
                 </div>
               </div>
-            </div>
-          </section>
-        ))}
+
+              {/* Execution / Dish Cards Side */}
+              <div className="p-6 md:p-16 lg:p-20 bg-white/50 backdrop-blur-sm border-l border-fellini-rule lg:overflow-y-auto lg:max-h-screen pt-20 lg:pt-20 shadow-inner">
+                <div className="max-w-2xl mx-auto">
+                  <div className="flex justify-between items-center mb-8 md:mb-12 border-b border-fellini-rule pb-4">
+                     <div className="font-mono text-[10px] tracking-[0.4em] text-fellini-ghost uppercase font-bold">
+                      System Cards // Founder Law
+                    </div>
+                    <div className="flex gap-2">
+                      <CheckCircle2 size={12} className="text-fellini-green" />
+                      <span className="font-mono text-[8px] text-fellini-green uppercase tracking-widest">Verified 2026.FS</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {engine.items.map((dish) => (
+                      <div key={dish.id}>
+                        <DishCard dish={dish} onSelect={setSelectedDish} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          );
+        })()}
 
         {/* Global System Footer */}
         <footer className="py-24 md:py-48 px-6 md:px-12 bg-white text-center relative overflow-hidden section-law border-t border-fellini-rule">
@@ -2323,10 +2652,10 @@ export default function App() {
                 ))}
               </div>
               <div className="font-mono text-[11px] text-fellini-ghost tracking-[0.5em] uppercase mb-4">
-                Fortune Tactical Archive // Galyons Rods 2026 // v2.7.2.FS
+                Fortune Tactical Archive // Galyons Rods 2026 // v2.8.1.FS
               </div>
               <div className="font-mono text-[8px] text-fellini-ghost/40 uppercase tracking-[0.3em]">
-                System built. Operator steady. Zero Drift Policy in Effect.
+                System built. Operator steady. Final Service Seal Active.
               </div>
            </motion.div>
         </footer>
