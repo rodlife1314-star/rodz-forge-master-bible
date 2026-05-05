@@ -58,7 +58,7 @@ interface Engine {
   };
 }
 
-// --- Data Archive v2.7.1 — FORGE BRAIN v2.0 ACTIVE ---
+// --- Data Archive v2.7.2 — ALLERGEN ENFORCEMENT LAYER v1.0 LIVE ---
 const ENGINES: Engine[] = [
   {
     id: "supply",
@@ -1209,7 +1209,98 @@ const ENGINES: Engine[] = [
     ]
   },
   {
-    id: "forge",
+    id: "allergen",
+    num: "11",
+    name: "Allergen\nEnforcement Layer",
+    type: "Supplier Gate · Auto-Block · Legal Shield",
+    identity: "\"No supplier declaration = no service. Allergens are not labels — they are hard gates.\"",
+    pressurePoint: "Missing Spec Sheet = BLOCKED",
+    controlLaws: [
+      { label: "Supplier Gate Law", text: "Every incoming ingredient must have current supplier allergen spec sheet attached before receiving acceptance." },
+      { label: "Substitution Law", text: "Any substitution triggers full allergen re-check. Unapproved change = BLOCKED." }
+    ],
+    allergens: ["ALLERGEN SHIELD ACTIVE"],
+    lead: { name: "LOGOS", role: "Compliance Brain", color: "#a3854d", icon: ShieldCheck },
+    dishes: [
+      {
+        id: "all01",
+        title: "ALL-001 Allergen Enforcement Protocol",
+        tag: "SUPPLY-LCK · All Items",
+        signal: "Supplier Declaration Gate",
+        meta: [
+          { label: "Status", value: "Locked v1.0", hi: true },
+          { label: "Audit", value: "Goods-In Gate" }
+        ],
+        fullSpec: {
+          "Rule": "Every incoming ingredient must have current supplier allergen spec sheet attached.",
+          "Status Fields": "CONFIRMED | PENDING AUDIT | BLOCKED",
+          "Auto-Reject": "No spec sheet = BLOCKED at goods-in. Item cannot enter kitchen.",
+          "Sub Rule": "Any substitution triggers full allergen re-check. Unapproved = BLOCKED.",
+          "FORGE Interface": "Missing allergen data = SERVICE BLOCKED for that dish."
+        },
+        method: [
+          "Check supplier spec folder against daily delivery.",
+          "Cross-reference every ingredient in active WMM batch.",
+          "Flag missing declarations to FORGE Brain immediately.",
+          "Block service on any unverified dish until data is verified."
+        ],
+        criticalNote: "No supplier declaration = no service. Legal shield is binary.",
+        reject: "Missing Spec Sheet · Unverified Sub · Stale Data",
+        founderLawLocked: true
+      },
+      {
+        id: "all02",
+        title: "ALL-002 Daily Allergen Audit",
+        tag: "PRE-SERVICE · FOH Gate",
+        signal: "Communication of Truth",
+        meta: [
+          { label: "Briefing", value: "Mandatory", hi: true },
+          { label: "Matrix", value: "Auto-Generated" }
+        ],
+        fullSpec: {
+          "Protocol": "FOH briefing must include updated allergen matrix from Supply Engine.",
+          "Removal": "Any BLOCKED item removed from service before doors open.",
+          "Verdict": "All active dishes must show CONFIRMED status.",
+          "Verification": "Weekly spot check of supplier declarations vs physical label."
+        },
+        method: [
+          "Generate daily allergen matrix from Bible data.",
+          "Brief FOH on changes or BLOCKED items.",
+          "Post physically verified matrix at service pass.",
+          "Update digital menu systems via FORGE link."
+        ],
+        criticalNote: "Allergens are not labels — they are hard gates.",
+        reject: "Briefing Skip · Outdated Matrix · Missing Label Audit",
+        founderLawLocked: true
+      },
+      {
+        id: "all03",
+        title: "ALL-003 Substitution Lockdown",
+        tag: "SUPPLY-LCK · Emergency Link",
+        signal: "Technical Zero-Trust Policy",
+        meta: [
+          { label: "Override", value: "DISABLED", hi: true },
+          { label: "Recalculate", value: "Mandatory" }
+        ],
+        fullSpec: {
+          "Rule": "Any ingredient substitution requires matching allergen certificate AND technical spec audit.",
+          "Barrier": "If no cert exists for sub, original item is DELETED from POS until source is secured.",
+          "Verification": "LOGOS must electronically sign off on any change to the 'Safe List'."
+        },
+        method: [
+          "Scan new supplier spec for hidden cross-contamination.",
+          "Compare against existing POS allergen flags.",
+          "Block item if technical specs don't match 1:1.",
+          "Issue 'Red Alert' to FOH on any recipe drift."
+        ],
+        criticalNote: "We do not guess. We verify or we block.",
+        reject: "Unverified origin · Hidden derivatives · LOGOS Lock-Out",
+        founderLawLocked: true
+      }
+    ]
+  },
+  {
+    id: "forge-brain",
     num: "10",
     name: "FORGE Brain\nv2.0",
     type: "Strategic Control · Drift Prediction · Recipe Completeness",
@@ -1358,7 +1449,8 @@ const AGENTS = [
   { name: "CLARA", color: "#4090e0", engineId: "starters" },
   { name: "VITO", color: "#e04040", engineId: "sides" },
   { name: "HELIOS", color: "#fbb140", engineId: "sunday" },
-  { name: "CORE", color: "#ffffff", engineId: "forge" }
+  { name: "SAFE", color: "#a3854d", engineId: "allergen" },
+  { name: "CORE", color: "#ffffff", engineId: "forge-brain" }
 ];
 
 // --- Components ---
@@ -1798,7 +1890,7 @@ function DishCard({ dish, onSelect }: { dish: Dish, onSelect: (dish: Dish) => vo
                 <span class="reject-text">${dish.reject}</span>
               </div>
 
-              <div class="footer">RODZ 2026 // GALYONS FELLINI MASTER BIBLE // v2.7.1.FS</div>
+              <div class="footer">RODZ 2026 // GALYONS FELLINI MASTER BIBLE // v2.7.2.FS</div>
             </div>
           </body>
         </html>
@@ -1956,7 +2048,11 @@ function AgentHUD({ lead }: { lead: Engine["lead"] }) {
 function AgentTabs({ activeAgent, onSelect }: { activeAgent: string, onSelect: (id: string, name: string) => void }) {
   return (
     <div className="fixed top-16 md:top-24 left-0 right-0 z-[80] flex justify-center no-print px-4 md:px-8">
-      <div className="flex bg-white/70 border border-fellini-rule p-1.5 backdrop-blur-xl overflow-x-auto max-w-full no-scrollbar rounded-full shadow-lg">
+          <div className="flex bg-white/70 border border-fellini-rule p-1.5 backdrop-blur-xl overflow-x-auto max-w-full no-scrollbar rounded-full shadow-lg">
+        <div className="px-4 border-r border-fellini-rule flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-fellini-accent animate-pulse" title="Allergen Layer Active" />
+          <span className="font-mono text-[9px] uppercase tracking-tighter text-fellini-accent font-bold">Safe Guard</span>
+        </div>
         {AGENTS.map((agent) => (
           <div key={agent.name} className="shrink-0">
             <button
@@ -2040,10 +2136,10 @@ export default function App() {
             GALYONS — RODZ 2026 SYSTEM KERNEL
           </span>
           <h1 className="font-sans text-6xl md:text-8xl font-bold tracking-tight text-fellini-black uppercase leading-tight mb-6">
-            FELLINI MASTER BIBLE v2.7.1
+            FELLINI MASTER BIBLE v2.7.2
           </h1>
           <div className="font-mono text-[11px] text-fellini-accent mb-12 tracking-[0.3em]">
-            v2.7.1 · FORGE Brain v2.0 Active · Integrity Score: 93/100
+            v2.7.2 · Allergen Enforcement Layer v1.0 · Integrity Score: 93/100
           </div>
           <button 
             onClick={() => setIsEntered(true)}
@@ -2079,7 +2175,7 @@ export default function App() {
         </div>
         <div className="flex items-center gap-8 font-mono text-[9px] tracking-[0.25em] text-fellini-ghost uppercase hidden lg:flex">
           <div className="flex items-center gap-4 border border-fellini-rule px-4 py-1.5 bg-fellini-accent/5">
-             <span className="text-fellini-accent opacity-50">Bible:</span> v2.7.1.FS
+             <span className="text-fellini-accent opacity-50">Bible:</span> v2.7.2.FS
           </div>
           <div className="flex items-center gap-2">
             <Activity size={10} className="text-fellini-green" />
@@ -2227,7 +2323,7 @@ export default function App() {
                 ))}
               </div>
               <div className="font-mono text-[11px] text-fellini-ghost tracking-[0.5em] uppercase mb-4">
-                Fortune Tactical Archive // Galyons Rods 2026 // v2.7.1.FS
+                Fortune Tactical Archive // Galyons Rods 2026 // v2.7.2.FS
               </div>
               <div className="font-mono text-[8px] text-fellini-ghost/40 uppercase tracking-[0.3em]">
                 System built. Operator steady. Zero Drift Policy in Effect.
