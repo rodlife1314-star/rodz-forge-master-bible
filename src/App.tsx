@@ -1227,7 +1227,7 @@ function DishCard(props: { dish: Dish; onSelect: (d: Dish | null) => void; onPri
            {onPrint && (
              <button 
                onClick={(e) => { e.stopPropagation(); onPrint(dish); }}
-               className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost hover:text-fellini-accent transition-colors print:hidden"
+               className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost hover:text-fellini-accent transition-colors no-print"
                title="Print Recipe Card"
              >
                <Printer size={16} />
@@ -1309,7 +1309,7 @@ function ForgeDashboard() {
   });
 
   return (
-    <div className="flex h-screen bg-fellini-bg overflow-hidden font-sans select-none no-print">
+    <div className="flex h-screen bg-fellini-bg overflow-hidden font-sans select-none">
       <div className="scanline-overlay pointer-events-none fixed inset-0 z-50 opacity-10" />
       
       {/* Sidebar Navigation */}
@@ -1323,7 +1323,7 @@ function ForgeDashboard() {
           <div className="px-8 pb-6 mb-6 border-b border-fellini-rule">
             <button
               onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
-              className={`w-full text-left px-6 py-4 flex items-center gap-4 rounded-xl transition-all ${(!selectedEngineId && !selectedStationId) ? 'bg-fellini-accent text-fellini-black shadow-lg scale-[1.02]' : 'hover:bg-fellini-bg text-fellini-ghost hover:text-fellini-black'}`}
+              className={`w-full text-left px-6 py-4 flex items-center gap-4 rounded-xl transition-all no-print ${(!selectedEngineId && !selectedStationId) ? 'bg-fellini-accent text-fellini-black shadow-lg scale-[1.02]' : 'hover:bg-fellini-bg text-fellini-ghost hover:text-fellini-black'}`}
             >
               <Layout size={18} className={(!selectedEngineId && !selectedStationId) ? 'text-fellini-black' : 'text-fellini-ghost'} />
               <div className="flex flex-col">
@@ -1339,7 +1339,7 @@ function ForgeDashboard() {
               <button
                 key={s.id}
                 onClick={() => { setSelectedStationId(s.id); setSelectedEngineId(null); }}
-                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all ${selectedStationId === s.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
+                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all no-print ${selectedStationId === s.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
               >
                 <div className="flex items-center gap-4">
                   <s.icon size={14} className={selectedStationId === s.id ? 'text-fellini-accent' : 'text-fellini-ghost'} />
@@ -1356,7 +1356,7 @@ function ForgeDashboard() {
               <button
                 key={e.id}
                 onClick={() => { setSelectedEngineId(e.id); setSelectedStationId(null); }}
-                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all ${selectedEngineId === e.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
+                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all no-print ${selectedEngineId === e.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-1.5 h-1.5 rounded-full ${selectedEngineId === e.id ? 'bg-fellini-accent' : 'bg-fellini-rule group-hover:bg-fellini-accent'}`} />
@@ -1390,15 +1390,15 @@ function ForgeDashboard() {
             {engine ? (
               <>
                 <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
-                  <engine.lead.icon size={24} />
+                  {engine.lead?.icon && <engine.lead.icon size={24} />}
                 </div>
                 <div>
                   <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">{engine.id} // {engine.version}</div>
-                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{engine.name.replace('\n', ' ')}</h1>
+                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{engine.name?.replace('\n', ' ')}</h1>
                 </div>
                 <button
                   onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
-                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors"
+                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors no-print"
                   title="Back to Navigator"
                 >
                   <RefreshCw size={20} />
@@ -1407,7 +1407,7 @@ function ForgeDashboard() {
             ) : station ? (
               <>
                 <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
-                  <station.icon size={24} />
+                  {station.icon && <station.icon size={24} />}
                 </div>
                 <div>
                   <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">Station // {station.id}</div>
@@ -1415,7 +1415,7 @@ function ForgeDashboard() {
                 </div>
                 <button
                   onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
-                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors"
+                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors no-print"
                   title="Back to Navigator"
                 >
                   <RefreshCw size={20} />
@@ -1442,7 +1442,7 @@ function ForgeDashboard() {
                     <button 
                       key={m} 
                       onClick={() => setSystemMode(m)}
-                      className={`px-3 py-1 font-mono text-[8px] rounded transition-all ${systemMode === m ? 'bg-fellini-black text-white' : 'text-fellini-ghost hover:text-fellini-black'}`}
+                      className={`px-3 py-1 font-mono text-[8px] rounded transition-all no-print ${systemMode === m ? 'bg-fellini-black text-white' : 'text-fellini-ghost hover:text-fellini-black'}`}
                     >
                       {m}
                     </button>
@@ -2023,12 +2023,15 @@ function ForgeDashboard() {
                    </div>
                    <div className="flex flex-col items-center text-center mb-12">
                       <div className="font-mono text-[10px] tracking-[0.5em] text-fellini-accent uppercase mb-4 font-black">Archive Print Protocol</div>
-                      <h3 className="text-6xl font-black text-fellini-black uppercase leading-[0.8] mb-2">{engine.name.replace('\n', ' ')}</h3>
+                      <h3 className="text-6xl font-black text-fellini-black uppercase leading-[0.8] mb-2">{engine.name?.replace('\n', ' ')}</h3>
                       <div className="font-mono text-[9px] text-fellini-ghost uppercase tracking-widest">{engine.version} // Station Print Card</div>
                    </div>
                    
                    <div className="space-y-4 mb-24 text-center">
-                     <button className="bg-fellini-black text-white px-12 py-4 font-mono text-xs uppercase tracking-widest font-black transition-all hover:scale-105 active:scale-95 flex items-center gap-4 mx-auto shrink-0">
+                     <button 
+                       onClick={() => window.print()}
+                       className="bg-fellini-black text-white px-12 py-4 font-mono text-xs uppercase tracking-widest font-black transition-all hover:scale-105 active:scale-95 flex items-center gap-4 mx-auto shrink-0 no-print"
+                     >
                        <Printer size={16} /> Execute System Print
                      </button>
                    </div>
@@ -2053,12 +2056,12 @@ function ForgeDashboard() {
                  <div className="flex gap-4">
                     <button 
                       onClick={() => handlePrint(selectedDish)} 
-                      className="p-4 bg-fellini-accent text-fellini-black hover:scale-110 transition-all rounded-full flex items-center justify-center shadow-lg"
+                      className="p-4 bg-fellini-accent text-fellini-black hover:scale-110 transition-all rounded-full flex items-center justify-center shadow-lg no-print"
                       title="Print Card"
                     >
                        <Printer size={24} />
                     </button>
-                    <button onClick={() => setSelectedDish(null)} className="p-4 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center">
+                    <button onClick={() => setSelectedDish(null)} className="p-4 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center no-print">
                        <XCircle size={24} />
                     </button>
                  </div>
@@ -2070,7 +2073,7 @@ function ForgeDashboard() {
                     <div className="space-y-8">
                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-widest font-black flex items-center gap-3"><Box size={14}/> Specification Lock</div>
                        <div className="space-y-4">
-                          {Object.entries(selectedDish.fullSpec).map(([k, v]) => (
+                          {selectedDish.fullSpec && Object.entries(selectedDish.fullSpec).map(([k, v]) => (
                              <div key={k} className="border-b border-fellini-rule pb-4">
                                <div className="font-mono text-[9px] text-fellini-ghost uppercase mb-1">{k}</div>
                                <div className="font-sans text-sm text-fellini-black font-bold uppercase tracking-tight">{v}</div>
@@ -2098,7 +2101,7 @@ function ForgeDashboard() {
 
       {/* --- Print-Only Specification Card --- */}
       {printedDish && (
-        <div id="print-section" className="hidden print:block fixed inset-0 bg-white text-black p-12 z-[9999]">
+        <div id="print-section" className="bg-white text-black p-12 z-[9999]" style={{ display: 'none' }}>
            <div className="border-4 border-black p-8 h-full flex flex-col">
               <div className="flex justify-between items-start border-b-4 border-black pb-6 mb-8">
                  <div>
@@ -2119,7 +2122,7 @@ function ForgeDashboard() {
                     <div className="mt-2 text-right">
                       <div className="font-mono text-[10px] uppercase font-black mb-1">Engine Source</div>
                       <div className="font-sans font-black text-sm uppercase">
-                        {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.name.replace('\n', ' ') || 'MASTER'}
+                        {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.name?.replace('\n', ' ') || 'MASTER'}
                       </div>
                     </div>
                  </div>
@@ -2130,7 +2133,7 @@ function ForgeDashboard() {
                     <section>
                        <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">WMM / Yield / Metadata</h2>
                        <div className="grid grid-cols-2 gap-4">
-                          {printedDish.meta.map((m, i) => (
+                          {printedDish.meta?.map((m, i) => (
                              <div key={i}>
                                 <div className="font-mono text-[9px] uppercase text-slate-500">{m.label}</div>
                                 <div className="font-sans text-sm font-bold uppercase">{m.value}</div>
@@ -2138,7 +2141,7 @@ function ForgeDashboard() {
                           ))}
                           <div>
                              <div className="font-mono text-[9px] uppercase text-slate-500">Status</div>
-                             <div className="font-sans text-sm font-bold uppercase">{printedDish.meta.find(m => m.label === 'Status')?.value || 'VERIFIED'}</div>
+                             <div className="font-sans text-sm font-bold uppercase">{printedDish.meta?.find((m: any) => m.label === 'Status')?.value || 'VERIFIED'}</div>
                           </div>
                           <div>
                              <div className="font-mono text-[9px] uppercase text-slate-500">Founder Law</div>
@@ -2150,14 +2153,28 @@ function ForgeDashboard() {
                     <section>
                        <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Technical Spec</h2>
                        <div className="space-y-3">
-                          {Object.entries(printedDish.fullSpec).map(([k, v]) => (
+                          {printedDish.fullSpec && Object.entries(printedDish.fullSpec).map(([k, v]) => (
                              <div key={k} className="flex justify-between items-baseline gap-4">
                                 <span className="font-mono text-[10px] uppercase text-slate-500 whitespace-nowrap">{k}</span>
-                                <span className="font-sans text-xs font-bold text-right leading-tight">{v}</span>
+                                <span className="font-sans text-xs font-bold text-right leading-tight">{typeof v === 'string' ? v : String(v)}</span>
                              </div>
                           ))}
                        </div>
                     </section>
+
+                    {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.layers.timeLaw && (
+                      <section>
+                         <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Time Law (Engine Baseline)</h2>
+                         <div className="space-y-2">
+                           {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.layers.timeLaw.map((tl, index) => (
+                             <div key={index} className="flex justify-between items-center text-xs">
+                               <span className="font-mono text-[9px] uppercase">{tl.step}</span>
+                               <span className={`font-sans font-bold ${tl.critical ? 'text-red-600' : ''}`}>{tl.duration}</span>
+                             </div>
+                           ))}
+                         </div>
+                      </section>
+                    )}
                     
                     <section>
                        <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Signals & Recovery</h2>
@@ -2171,7 +2188,7 @@ function ForgeDashboard() {
                           </div>
                           <div>
                              <div className="font-mono text-[9px] uppercase text-slate-500">Reject Boundary (Fail Protocol)</div>
-                             <div className="font-sans text-xs font-bold uppercase text-red-600">{printedDish.reject}</div>
+                             <div className="font-sans text-xs font-bold uppercase text-red-600">{printedDish.reject || 'STATION DEFAULT'}</div>
                           </div>
                           <div>
                              <div className="font-mono text-[9px] uppercase text-slate-500">Max Recovery</div>
@@ -2185,7 +2202,7 @@ function ForgeDashboard() {
                     <section>
                        <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Method Logic</h2>
                        <div className="space-y-4">
-                          {printedDish.method.map((m, i) => (
+                          {printedDish.method?.map((m, i) => (
                              <div key={i} className="flex gap-4">
                                 <span className="font-mono text-xs font-bold">{i + 1}.</span>
                                 <p className="font-sans text-sm leading-snug">{m}</p>
@@ -2197,7 +2214,7 @@ function ForgeDashboard() {
                     <section className="bg-slate-100 p-6 rounded border-2 border-black">
                        <h2 className="font-mono text-[10px] uppercase font-black mb-2">Critical Note / Jemma Mapping</h2>
                        <p className="font-serif italic text-base leading-tight mb-4">"{printedDish.criticalNote}"</p>
-                       <div className="font-mono text-[8px] uppercase font-black text-slate-500">Validator Ref: {printedDish.fullSpec.Jemma || 'DEFAULT_GATE'}</div>
+                       <div className="font-mono text-[8px] uppercase font-black text-slate-500">Validator Ref: {printedDish.fullSpec?.Jemma || 'DEFAULT_GATE'}</div>
                     </section>
                  </div>
               </div>
@@ -2212,21 +2229,28 @@ function ForgeDashboard() {
 
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          body > * {
+          .no-print {
             display: none !important;
           }
           #print-section {
             display: block !important;
-            position: absolute !important;
+            position: fixed !important;
             left: 0 !important;
             top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 1.5cm !important;
+            background: white !important;
+            color: black !important;
+            z-index: 99999 !important;
+          }
+          html, body {
+            background-color: white !important;
             width: 100% !important;
             height: 100% !important;
-            margin: 0 !important;
-            padding: 2cm !important;
-          }
-          aside, header, main, .RecoveryCommandCenter {
-            display: none !important;
           }
         }
       `}} />
