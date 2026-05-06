@@ -80,3 +80,27 @@
     }
   }
 }
+
+/* KILL CUSTOM POINTERS */
+* {
+  cursor: auto !important;
+}
+
+button, a, .clickable {
+  cursor: pointer !important;
+}
+
+/* REMOVE GLITCH ELEMENTS */
+.cursor-dot, 
+.cursor-ring, 
+.mouse-follower,
+#custom-cursor {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* RESET BODY */
+body {
+  overflow: hidden; /* Prevent double scroll with the new sidebar layout */
+}
