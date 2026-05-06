@@ -9,6 +9,8 @@ import {
   Flame,
   Layout,
   Waves,
+  Monitor,
+  Check,
   Zap,
   Box,
   PieChart,
@@ -42,7 +44,10 @@ import {
   TrendingUp,
   Fingerprint,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  Bell,
+  BookOpen,
+  Search
 } from "lucide-react";
 
 // --- Types ---
@@ -197,6 +202,11 @@ interface Dish {
   criticalNote: string;
   reject: string;
   founderLawLocked: boolean;
+  entryCondition?: string;
+  passSignals?: string[];
+  releaseCondition?: string;
+  maxRecovery?: string;
+  passAuthority?: string;
 }
 
 type EngineLayerStack = {
@@ -314,78 +324,269 @@ const ENGINES: Engine[] = [
     },
     items: [
       {
-        id: "lun01",
-        title: "Al Dente Rigatoni",
-        tag: "LUNA-001 · Aqueous Law",
-        signal: "90% Hydration core lock via Drain & Hold protocol.",
+        id: "prep022",
+        title: "Bone Reduction (Batch)",
+        tag: "PREP-022 · LUNA-002 · PATTERN: over-concentration drift",
+        signal: "Stable gelatinous body when cold. Deep mahogany clarity.",
+        entryCondition: "Ingredients within defined temp range; Equipment pre-heated; No Jemma failure.",
+        passSignals: [
+          "Coats spoon fully (nappe scale 4)",
+          "Line holds ≥2 seconds before break",
+          "No visible oil layer >2 mm"
+        ],
+        releaseCondition: "PASS signals achieved; 30% volume target met; Within TIME LAW window; No active Jemma breach.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "SUBJECT TO BRIDGE LAW (LUNA OVERRIDE)",
         meta: [
-          { label: "Hydration", value: "90% Window", hi: true },
-          { label: "Salinity", value: "1.2%" }
+          { label: "Yield", value: "10L Batch" },
+          { label: "Simmer", value: "12-24h" }
         ],
         fullSpec: {
-          "Thermal": "100°C Rapid Boil.",
-          "Salinity": "12g salt per kg water.",
-          "Time": "8m 45s target pull.",
-          "Drain": "Immediate drain at 90% hydration."
+          "Thermal": "92°C constant (no boil)",
+          "Time Law": "12-24h (Fail >26h)",
+          "Jemma": "REDUCTION DRIFT / EXTRACTION FAILURE"
         },
         method: [
-          "Verify water salinity at 1.2% using refractometer.",
-          "Drop pasta into rapid boil. Start Luna Timer.",
-          "At 8:45, probe core. Verify 90% hydration (resistant white nib).",
-          "Drain immediately. Use light oil/air hold to manage carry-over."
+          "Roast bones at 220°C.",
+          "Caramelise mirepoix/tomato paste.",
+          "Deglaze with wine to syrup consistency.",
+          "Simmer 12-24h at 92°C. Strain.",
+          "Reduce by 50% until nappe.",
+          "RECOVERY: If watery, reduce further. If cloudy, clarify. If bitter, REJECT."
         ],
-        criticalNote: "Hydration > 95% indicates Starch Collapse. Poor drainage indicates Waterlogging Failure.",
-        reject: "Blighted starch · Surface slime · Texture slip",
+        criticalNote: "Temp >94°C causes fat emulsification and permanent cloudiness.",
+        reject: "Cloudy/greasy · Bitter or burnt · Watery at 4°C",
         founderLawLocked: true
       },
       {
-        id: "lun02",
-        title: "Dark Mother Stock",
-        tag: "LUNA-002 · Viscosity Law",
-        signal: "Binary clarity achieved. Fat-water union stable.",
+        id: "prep017",
+        title: "House Mayo",
+        tag: "PREP-017 · LUNA-002 · PATTERN: emulsion instability cluster",
+        signal: "Glossy mount that holds shape. Pale yellow uniformity.",
+        entryCondition: "Yolks at room temp (18-22°C); Oil at storage temp; Whisk speed calibrated.",
+        passSignals: [
+          "No oil separation after 30 sec rest",
+          "Holds peak ≥5 seconds",
+          "Uniform pale yellow (no streaks)"
+        ],
+        releaseCondition: "PASS signals achieved; Within 72h window; No Jemma breach.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
         meta: [
-          { label: "Temp", value: "92°C", hi: false },
-          { label: "Viscosity", value: "Coating", hi: true }
+          { label: "Yield", value: "5L (250p)" },
+          { label: "Stability", value: "72h window" }
         ],
         fullSpec: {
-          "Thermal": "95°C Max (Steady state).",
-          "Purity": "Zero Agitation Protocol.",
-          "Reduction": "Initial Volume / 2.",
-          "Finish": "Fine pass through chinois."
+          "Window": "10 min prep",
+          "Thermal": "<8°C rise during prep",
+          "Jemma": "EMULSION LOCK FAILURE / PURITY BREACH"
         },
         method: [
-          "Load bones and aromatics. Submerge in cold filtered water.",
-          "Bring to 92°C. Lock induction state. Do not exceed 95°C.",
-          "Skim surface impurities every 45 mins. Do not stir.",
-          "After extraction, strain and reduce by 50% until viscosity holds on spoon."
+          "Whisk yolks and mustard.",
+          "Slow micro-stream oil (prevent yolk saturation).",
+          "Finish with acid and season. Chill immediately.",
+          "RECOVERY: Slowly whisk split mix into fresh base (yolk/mustard)."
         ],
-        criticalNote: "Rolling boil > 96°C causes irreversible turbidity (Cloudy Stock). GREASY SPLIT requires re-bind.",
-        reject: "Cloudy liquid · Greasy split · Acrid nose",
+        criticalNote: "Excessive oil delivery speed or thermal rise >8°C causes lock failure.",
+        reject: "Visible oil droplets · Grainy/Curdled texture · Edge separation",
         founderLawLocked: true
       },
       {
-        id: "lun03",
-        title: "Crystal Har Gau",
-        tag: "LUNA-003 · Atmospheric Law",
-        signal: "Uniform saturation achieved. Translucent integrity locked.",
+        id: "prep032",
+        title: "Sticky Toffee Sauce",
+        tag: "PREP-032 · LUNA-002 · PATTERN: crystallization point drift",
+        signal: "Glossy deep amber finish. Absolute smooth nappe.",
+        entryCondition: "Butter and sugar staged; Cream at 50°C (prevent shock).",
+        passSignals: [
+          "Glossy deep amber finish",
+          "Absolute smooth nappe (no crystallization)",
+          "Integrated fat (no surface sheen)"
+        ],
+        releaseCondition: "Thermal law 104°C met; PASS signals achieved.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
         meta: [
-          { label: "Density", value: "100% RH", hi: true },
-          { label: "Surface", value: "Vibrant", hi: false }
+          { label: "Yield", value: "3L Batch" },
+          { label: "Target", value: "104°C Exactly" }
         ],
         fullSpec: {
-          "Thermal": "100°C Gaseous Steam.",
-          "Density": "Max Saturation / Zero Condensation.",
-          "Time": "6m 30s precision cook.",
-          "Seal": "Grade-A Pressure Lock."
+          "Thermal": "Must reach 104°C (Fail >106°C)",
+          "Caramel": "Rich roasted aroma",
+          "Jemma": "THERMAL DRIFT / EMULSION FAILURE"
         },
         method: [
-          "Pre-heat enclosure to 100°C. Lock steam density at 100% RH.",
-          "Load product. Engage Enclosure Law. Do not breach seal.",
-          "Monitor Condensation Shield. Ensure no droplet impact.",
-          "Release at 6:30. Verify surface is vibrant and structural."
+          "Melt butter and sugar.",
+          "Boil to 104°C exactly (The Thermal Law).",
+          "Deglaze with cream and whisk until glossy.",
+          "RECOVERY: If grainy, reheat to 104°C + 5% warm cream. If burnt, REJECT."
         ],
-        criticalNote: "Surface Waterlogging (Soggy skin) results in REJECT. Enclosure Breach > 10s requires Refire.",
-        reject: "Soggy skin · Tough surface · Leaking core",
+        criticalNote: "Failure to reach 104°C prevents full integration. >106°C = bitter.",
+        reject: "Grainy texture (under-temp) · Visible fat separation · Burnt smell",
+        founderLawLocked: true
+      },
+      {
+        id: "prep023",
+        title: "Galyons Gravy (Finish)",
+        tag: "PREP-023 · LUNA-003 · PATTERN: gloss saturation loss",
+        signal: "Deep mahogany mirror gloss. Stable nappe.",
+        entryCondition: "Bone reduction at 90°C; Roux at station; Pan drippings verified.",
+        passSignals: [
+          "Deep mahogany mirror gloss",
+          "Absolute nappe (coats back of spoon)",
+          "No visible fat separate"
+        ],
+        releaseCondition: "PASS signals achieved; Temp ≥75°C; No Jemma breach.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "BRIDGE LAW SUBJECT",
+        meta: [
+          { label: "Yield", value: "5L Batch" },
+          { label: "Hold", value: "75°C+" }
+        ],
+        fullSpec: {
+          "Time": "30 min finish window",
+          "Viscosity": "Absolute nappe",
+          "Jemma": "STARCH CLUMPING / REDUCTION DRIFT"
+        },
+        method: [
+          "Boil reduction. Whisk in roux.",
+          "Reduce to simmer. Add pan drippings.",
+          "Reduce to nappe. Finish with butter whisk.",
+          "RECOVERY: If lumpy, pass through fine sieve. If greasy, high-RPM blend."
+        ],
+        criticalNote: "Under-cooking roux or failing to whisk leads to starch clumping.",
+        reject: "Skin formation · Visible fat split · Floury/Raw starch aftertaste",
+        founderLawLocked: true
+      },
+      {
+        id: "prep025",
+        title: "Peppercorn Sauce",
+        tag: "PREP-025 · LUNA-003 · PATTERN: suspension stability failure",
+        signal: "Glossy surface. Uniform peppercorn suspension.",
+        entryCondition: "Brandy reduction staged; Bone reduction simmered.",
+        passSignals: [
+          "Glossy surface intensity",
+          "Uniform peppercorn suspension (no puddling)",
+          "Stable nappe (no oil bleed)"
+        ],
+        releaseCondition: "PASS signals achieved; NAPPE LAW verified.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
+        meta: [
+          { label: "Yield", value: "2L" },
+          { label: "Service", value: "65°C" }
+        ],
+        fullSpec: {
+          "Reduction": "Brandy reduce 80%",
+          "Law": "NAPPE LAW (Reduction before fat)",
+          "Jemma": "EMULSION FAILURE / REDUCTION DRIFT"
+        },
+        method: [
+          "Reduce brandy 80%. Add bone reduction and simmer.",
+          "Add cream and reduce to nappe.",
+          "Finish with peppercorns.",
+          "RECOVERY: If split, whisk in cold cream hit off-heat."
+        ],
+        criticalNote: "Nappe Law breach: Attempting fat enrichment before structural reduction.",
+        reject: "Visible oil bleed · Peppercorns puddled · Split fat",
+        founderLawLocked: true
+      },
+      {
+        id: "prep026",
+        title: "Blue Cheese Sauce",
+        tag: "PREP-026 · LUNA-002 · PATTERN: protein graining incident",
+        signal: "Silky ivory texture with visible blue flecks.",
+        entryCondition: "Shallot base cooled to <70°C; Cream reduction stable.",
+        passSignals: [
+          "Silky ivory texture (no grain)",
+          "Uniform blue flecks",
+          "No visible fat bleed at 60°C"
+        ],
+        releaseCondition: "OFF-HEAT Law verified; Integration <70°C; PASS signals met.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
+        meta: [
+          { label: "Yield", value: "2L" },
+          { label: "Service", value: "60°C" }
+        ],
+        fullSpec: {
+          "Law": "OFF-HEAT LAW (Cheese integration)",
+          "Thermal": "<70°C integration",
+          "Jemma": "PROTEIN GRAINING / THERMAL BREACH"
+        },
+        method: [
+          "Sweat shallots. Deglaze wine to syrup.",
+          "Add cream and reduce slightly.",
+          "OFF-HEAT: Whisk Gorgonzola until silky.",
+          "RECOVERY: If thin, whisk extra cheese. Grainy is non-recoverable."
+        ],
+        criticalNote: "Protein graining occurs via excessive heat (>70°C) during integration.",
+        reject: "Grainy texture · Split fat bleed · Grey oxidation",
+        founderLawLocked: true
+      },
+      {
+        id: "prep027",
+        title: "Fish Bisque Sauce",
+        tag: "PREP-027 · LUNA-003 · PATTERN: carotenoid oxidation drift",
+        signal: "Vibrant coral colour. Velvety finish. Absolute nappe.",
+        entryCondition: "Shells roasted to mahogany; Stock clarified before reduction.",
+        passSignals: [
+          "Vibrant coral saturation",
+          "Velvety finish (no grit)",
+          "Absolute nappe (coats back of spoon)"
+        ],
+        releaseCondition: "PASS signals achieved; Monte au beurre verified at 60°C; No bitterness.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
+        meta: [
+          { label: "Yield", value: "2L" },
+          { label: "Finish", value: "Monte au beurre" }
+        ],
+        fullSpec: {
+          "Simmer": "45m simmer / 20m reduce",
+          "Heat": "Hold at 60°C",
+          "Jemma": "EMULSION FAILURE / CAROTENOID OXIDATION"
+        },
+        method: [
+          "Roast shells (200°C). Flamme brandy.",
+          "Deglaze stock, simmer 45m. Strain (hard press).",
+          "Reduce 50%. Add cream. Monte au beurre at 60°C.",
+          "RECOVERY: If split, cold cream hit off-heat. If bitter, REJECT."
+        ],
+        criticalNote: "Shell boiling after butter enrichment causes emulsion breakage.",
+        reject: "Oil bleed · Broken emulsion · Burnt shell aroma",
+        founderLawLocked: true
+      },
+      {
+        id: "prep028",
+        title: "House Vinaigrette",
+        tag: "PREP-028 · LUNA-002 · PATTERN: suspension failure cluster",
+        signal: "Glassy coating on leaf. Sharp acid balance.",
+        entryCondition: "Shallots fine brunoise verified; Mustard/Acid base integrated.",
+        passSignals: [
+          "Glassy leaf coating (no droplets)",
+          "Sharp acid clarity",
+          "Stable suspension (no separation after 5 min)"
+        ],
+        releaseCondition: "Ratio Lock 3:1 verified; Passing signals achieved.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
+        meta: [
+          { label: "Ratio", value: "3:1 Ratio Lock" },
+          { label: "Shelf", value: "14 days" }
+        ],
+        fullSpec: {
+          "Method": "Slow whisk oil",
+          "Emulsifier": "Dijon mustard focus",
+          "Jemma": "SUSPENSION FAILURE"
+        },
+        method: [
+          "Whisk vinegar, mustard, and honey.",
+          "Slowly whisk in oil to lock ratio.",
+          "Fold in fine shallots.",
+          "RECOVERY: Add extra Dijon and re-whisk aggressively."
+        ],
+        criticalNote: "Ratio Lock breach: Insufficient emulsifier for fat volume.",
+        reject: "Total separation · Oxidized shallots · Greasy mouthfeel",
         founderLawLocked: true
       }
     ]
@@ -431,8 +632,17 @@ const ENGINES: Engine[] = [
       {
         id: "sun01",
         title: "The Ultimate Roast Potatoes",
-        tag: "HELIOS-001 · Thermal Master",
+        tag: "HELIOS-001 · LUNA-ATMOS · PATTERN: structural shatter collapse",
         signal: "Glass-crunch skin, fluffy interior. Thermal precision is law.",
+        entryCondition: "Potatoes par-boiled to 'shaggy' state; Fat at 220°C; Dry surface verified.",
+        passSignals: [
+          "Glass-crunch skin shatter on probe",
+          "No internal oil saturation",
+          "Fluffy interior density"
+        ],
+        releaseCondition: "Pass check: Audible shatter. Surface temp 220°C checked.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "HELIOS MASTER",
         meta: [
           { label: "Texture", value: "SHATTER-LOCK", hi: true },
           { label: "Internal", value: "FLUFFY" }
@@ -451,6 +661,63 @@ const ENGINES: Engine[] = [
         ],
         criticalNote: "Helios protects the shatter. If it doesn't crunch, it returns to fire.",
         reject: "Soft skin · Pale colour · Oil saturation · Structural collapse",
+        founderLawLocked: true
+      },
+      {
+        id: "prep016",
+        title: "Crumble Mix",
+        tag: "HELIOS + PREP · PATTERN: cluster size drift",
+        signal: "Audible crunch on fracture. Golden brown irregular clusters.",
+        entryCondition: "Butter cubes staged at <4°C; Flour/Sugar mix integrated.",
+        passSignals: [
+          "Audible crunch on fracture",
+          "Golden brown irregular clusters (rubble stage)",
+          "No visible fat bleed on tray"
+        ],
+        releaseCondition: "Bake time 22m met; Pass signals achieved; Rubble Law verified.",
+        maxRecovery: "1 ATTEMPT (FAILURE 002 = REJECT)",
+        passAuthority: "STATION MASTER",
+        meta: [
+          { label: "Yield", value: "5kg" },
+          { label: "Bake", value: "170°C / 22m" }
+        ],
+        fullSpec: {
+          "Friction": "Rub window: <8°C internal",
+          "Law": "RUBBLE STAGE (Manual check)",
+          "Jemma": "STRUCTURAL COLLAPSE / THERMAL MELT"
+        },
+        method: [
+          "Cube butter (1cm) and rub into flour/sugar with fingertips.",
+          "STOP at rubble stage. Do not overwork.",
+          "Tray spread ≤2cm. Bake at 170°C for 22 min.",
+          "RECOVERY: If pale, bake 3-5 min. If fat melts, REJECT."
+        ],
+        criticalNote: "Rubbing window must keep internal temp <8°C to prevent fat smear.",
+        reject: "Fat smear texture · Pale/uniform sandy texture · Burnt base",
+        founderLawLocked: true
+      },
+      {
+        id: "prep024",
+        title: "Pulled Pork",
+        tag: "PREP-024 · HELIOS · TAG: shred elasticity",
+        signal: "Succulent finish. Hand-shred texture. 94°C internal reached.",
+        meta: [
+          { label: "Time", value: "8 hours" },
+          { label: "Internal", value: "94°C" }
+        ],
+        fullSpec: {
+          "Law": "LOW & SLOW LAW (Collagen breakdown)",
+          "Temp": "140°C Roast",
+          "Jemma": "THERMAL FAILURE / COLLAGEN STASIS"
+        },
+        method: [
+          "Apply rub 24h prior (Dry Brine).",
+          "Slow roast at 140°C for 8h until internal 94°C.",
+          "Hand-shred while warm. Hydrate with juices and apple juice.",
+          "RECOVERY: If tough, return to heat for 60 min. If dry, hydrate with juices."
+        ],
+        criticalNote: "Insufficient collagen breakdown if internal temperature fails to hit 94°C.",
+        reject: "Tough un-shreddable core · Greasy residue pooling · Dry strands",
         founderLawLocked: true
       }
     ]
@@ -582,6 +849,15 @@ const ENGINES: Engine[] = [
       }
     ]
   }
+];
+
+const STATIONS = [
+  { id: 'mains', name: 'Mains', icon: Layout, lead: 'JEMMA' },
+  { id: 'pizza', name: 'Pizza', icon: Flame, lead: 'HELIOS' },
+  { id: 'burgers', name: 'Burgers', icon: Zap, lead: 'HELIOS' },
+  { id: 'fry', name: 'Fry', icon: Waves, lead: 'LUNA' },
+  { id: 'dessert', name: 'Dessert', icon: SunMedium, lead: 'HELIOS' },
+  { id: 'prep', name: 'Prep', icon: Shield, lead: 'LOGOS' },
 ];
 
 const AGENTS = [
@@ -795,7 +1071,7 @@ function MemoryEvolutionHUD(props: { activeScenario: StressScenario }) {
     activeScenario === 'LUNA_PATTERN_LEAD' ? {
       id: 'LUNA-PATTERN-01',
       pattern: 'COMMON FAILURE: OVER-CONCENTRATION DRIFT across Stock, Sauce, and Glaze.',
-      change: 'LUNA-MOD-001 (CONDITIONAL): Reduce reduction temperature by –7% and extend reduction window by +12% ONLY when Mode = VELOCITY or PEAK.',
+      change: 'LUNA-MOD-001 (CONDITIONAL)\n\nWHEN:\nMode = VELOCITY or PEAK\nAND\nPattern = Over-Concentration Drift\n\nTHEN:\n- Reduce reduction temperature by –7%\n- Extend reduction window by +12%\n\nELSE:\n- Maintain baseline v1.2.0 behaviour',
       oldSpec: 'Standard Reduction Scale',
       newSpec: 'v1.3.1-BETA Calibration',
       isConditional: true
@@ -865,7 +1141,7 @@ function MemoryEvolutionHUD(props: { activeScenario: StressScenario }) {
                     </div>
                     <div>
                        <div className="font-mono text-[9px] text-fellini-ghost uppercase mb-2">Proposed Law Change</div>
-                       <p className="font-sans text-lg font-bold text-fellini-accent uppercase tracking-tight mb-6">{proposal.change}</p>
+                       <p className="font-sans text-lg font-bold text-fellini-accent uppercase tracking-tight mb-6 whitespace-pre-line">{proposal.change}</p>
                        
                        {proposal.isConditional && (
                           <div className="mb-6 p-4 bg-fellini-accent/10 border border-fellini-accent/20 rounded-xl">
@@ -912,7 +1188,7 @@ function MemoryEvolutionHUD(props: { activeScenario: StressScenario }) {
               >
                  <ShieldCheck size={48} className="text-fellini-green mb-6 mx-auto md:mx-0" />
                  <h3 className="font-sans text-4xl font-black text-fellini-green uppercase tracking-tighter mb-4">Deterministic Law Updated</h3>
-                 <p className="font-serif italic text-xl text-white/60 leading-relaxed mb-6">"Proposal {proposal.id} has been validated and locked by Operator. {proposal.isConditional ? 'The engine has been versioned to v1.2.1-BETA (Context-Bound).' : 'The engine spec has been versioned to v3.1.2-Adaptive.'}"</p>
+                 <p className="font-serif italic text-xl text-white/60 leading-relaxed mb-6">"Proposal {proposal.id} has been validated and locked by Operator. {proposal.isConditional ? 'v1.2.1-BETA → CONTEXT-BOUND → Promoted to FORGE v2.9.2 — STABLE' : 'The engine spec has been versioned to v3.1.2-Adaptive.'}"</p>
                  <button onClick={() => setProposal(null)} className="font-mono text-[10px] text-white/40 hover:text-white uppercase tracking-widest">Acknowledge Version Change</button>
               </motion.div>
             ) : (
@@ -934,8 +1210,8 @@ function MemoryEvolutionHUD(props: { activeScenario: StressScenario }) {
 
 // --- Components ---
 
-function DishCard(props: { dish: Dish; onSelect: (d: Dish | null) => void; key?: string | number }) {
-  const { dish, onSelect } = props;
+function DishCard(props: { dish: Dish; onSelect: (d: Dish | null) => void; onPrint?: (d: Dish) => void; key?: string | number }) {
+  const { dish, onSelect, onPrint } = props;
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -947,8 +1223,19 @@ function DishCard(props: { dish: Dish; onSelect: (d: Dish | null) => void; key?:
           <div className="font-mono text-[9px] text-fellini-accent uppercase tracking-widest font-black mb-1">{dish.tag}</div>
           <h3 className="font-sans text-xl font-bold text-fellini-black uppercase tracking-tight group-hover:text-fellini-accent transition-colors">{dish.title}</h3>
         </div>
-        <div className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost group-hover:text-fellini-accent transition-colors">
-          <Terminal size={16} />
+        <div className="flex gap-2">
+           {onPrint && (
+             <button 
+               onClick={(e) => { e.stopPropagation(); onPrint(dish); }}
+               className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost hover:text-fellini-accent transition-colors print:hidden"
+               title="Print Recipe Card"
+             >
+               <Printer size={16} />
+             </button>
+           )}
+           <div className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost group-hover:text-fellini-accent transition-colors">
+             <Terminal size={16} />
+           </div>
         </div>
       </div>
       <p className="font-serif italic text-fellini-ghost text-sm mb-6 line-clamp-2">"{dish.signal}"</p>
@@ -981,23 +1268,41 @@ function RecoveryCommandCenter() {
 
 function ForgeDashboard() {
   const [activeTab, setActiveTab] = useState('Overview');
-  const [selectedEngineId, setSelectedEngineId] = useState('supply');
+  const [selectedEngineId, setSelectedEngineId] = useState<string | null>(null);
+  const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
   const [systemMode, setSystemMode] = useState('PRECISION');
   const [systemState, setSystemState] = useState('LIVE');
   const [userRole, setUserRole] = useState<UserRole>('roles/forge.operator');
   const [activeScenario, setActiveScenario] = useState<StressScenario>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [printedDish, setPrintedDish] = useState<Dish | null>(null);
+
+  const handlePrint = (dish: Dish) => {
+    setPrintedDish(dish);
+    // Give state time to update for the printable section
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const engine = ENGINES.find(e => e.id === selectedEngineId) || ENGINES[0];
+  const engine = ENGINES.find(e => e.id === selectedEngineId) || null;
+  const station = STATIONS.find(s => s.id === selectedStationId) || null;
   
+  useEffect(() => {
+    if (!engine && !station && !['Overview', 'Observation', 'Stress Test'].includes(activeTab)) {
+      setActiveTab('Overview');
+    }
+  }, [engine, station, activeTab]);
+
   const allTabs = ['Overview', 'Laws', 'WMM', 'Allergen', 'GP', 'Recovery', 'Observation', 'Stress Test', 'Print'];
   const tabs = allTabs.filter(tab => {
+    if (!engine && !station) return ['Overview', 'Observation', 'Stress Test'].includes(tab);
     if (userRole === 'roles/forge.line') return ['Overview', 'Laws', 'WMM', 'Allergen'].includes(tab);
     if (userRole === 'roles/forge.head_chef') return ['Overview', 'Laws', 'WMM', 'Allergen', 'GP', 'Recovery', 'Print'].includes(tab);
     return true;
@@ -1011,27 +1316,59 @@ function ForgeDashboard() {
       <aside className="w-80 border-r border-fellini-rule bg-white flex flex-col z-40">
         <div className="p-8 border-b border-fellini-rule">
            <div className="font-sc text-xl tracking-[0.3em] text-fellini-black uppercase font-bold mb-1">Forge Bible</div>
-           <div className="font-mono text-[9px] text-fellini-ghost tracking-[0.2em] uppercase">v2.9.0.INTEL // Observation Engine</div>
+           <div className="font-mono text-[9px] text-fellini-ghost tracking-[0.2em] uppercase">v2.9.2.STABLE // Observation Engine</div>
         </div>
 
         <div className="flex-1 overflow-y-auto py-6">
-          <div className="px-8 mb-4 font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] font-bold">Stations</div>
-          {ENGINES.map(e => (
+          <div className="px-8 pb-6 mb-6 border-b border-fellini-rule">
             <button
-              key={e.id}
-              onClick={() => setSelectedEngineId(e.id)}
-              className={`w-full text-left px-8 py-4 flex items-center justify-between group transition-all ${selectedEngineId === e.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
+              onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
+              className={`w-full text-left px-6 py-4 flex items-center gap-4 rounded-xl transition-all ${(!selectedEngineId && !selectedStationId) ? 'bg-fellini-accent text-fellini-black shadow-lg scale-[1.02]' : 'hover:bg-fellini-bg text-fellini-ghost hover:text-fellini-black'}`}
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-1.5 h-1.5 rounded-full ${selectedEngineId === e.id ? 'bg-fellini-accent' : 'bg-fellini-rule group-hover:bg-fellini-accent'}`} />
-                <div className="flex flex-col">
-                   <span className={`font-mono text-[10px] tracking-widest uppercase ${selectedEngineId === e.id ? 'text-fellini-accent' : 'text-fellini-ghost'}`}>{e.num}</span>
-                   <span className="font-sans text-xs font-bold tracking-tight uppercase">{e.name.replace('\n', ' ')}</span>
-                </div>
+              <Layout size={18} className={(!selectedEngineId && !selectedStationId) ? 'text-fellini-black' : 'text-fellini-ghost'} />
+              <div className="flex flex-col">
+                <span className="font-mono text-[9px] uppercase tracking-widest font-bold">Root</span>
+                <span className="font-sans text-xs font-black uppercase tracking-tight">Bible Navigator</span>
               </div>
-              <ChevronRight size={14} className={`transition-transform ${selectedEngineId === e.id ? 'translate-x-1 text-fellini-accent' : 'opacity-0 group-hover:opacity-100'}`} />
             </button>
-          ))}
+          </div>
+
+          <div className="px-8 mb-4 font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] font-bold">Station Registry</div>
+          <div className="space-y-1 mb-8">
+            {STATIONS.map(s => (
+              <button
+                key={s.id}
+                onClick={() => { setSelectedStationId(s.id); setSelectedEngineId(null); }}
+                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all ${selectedStationId === s.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <s.icon size={14} className={selectedStationId === s.id ? 'text-fellini-accent' : 'text-fellini-ghost'} />
+                  <span className="font-sans text-xs font-bold tracking-tight uppercase">{s.name}</span>
+                </div>
+                <ChevronRight size={14} className={`transition-transform ${selectedStationId === s.id ? 'translate-x-1 text-fellini-accent' : 'opacity-0 group-hover:opacity-100'}`} />
+              </button>
+            ))}
+          </div>
+
+          <div className="px-8 mb-4 font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] font-bold">Engine Registry</div>
+          <div className="space-y-1">
+            {ENGINES.map(e => (
+              <button
+                key={e.id}
+                onClick={() => { setSelectedEngineId(e.id); setSelectedStationId(null); }}
+                className={`w-full text-left px-8 py-3 flex items-center justify-between group transition-all ${selectedEngineId === e.id ? 'bg-fellini-black text-white' : 'hover:bg-fellini-black/5'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-1.5 h-1.5 rounded-full ${selectedEngineId === e.id ? 'bg-fellini-accent' : 'bg-fellini-rule group-hover:bg-fellini-accent'}`} />
+                  <div className="flex flex-col">
+                    <span className={`font-mono text-[10px] tracking-widest uppercase ${selectedEngineId === e.id ? 'text-fellini-accent' : 'text-fellini-ghost'}`}>{e.num}</span>
+                    <span className="font-sans text-xs font-bold tracking-tight uppercase">{e.name.replace('\n', ' ')}</span>
+                  </div>
+                </div>
+                <ChevronRight size={14} className={`transition-transform ${selectedEngineId === e.id ? 'translate-x-1 text-fellini-accent' : 'opacity-0 group-hover:opacity-100'}`} />
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="p-8 border-t border-fellini-rule bg-fellini-bg/50">
@@ -1050,13 +1387,51 @@ function ForgeDashboard() {
         {/* Header Bar */}
         <header className="h-32 border-b border-fellini-rule flex items-center justify-between px-12 bg-white backdrop-blur-md z-30">
           <div className="flex items-center gap-8">
-            <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
-              <engine.lead.icon size={24} />
-            </div>
-            <div>
-              <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">{engine.id} // {engine.version}</div>
-              <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{engine.name.replace('\n', ' ')}</h1>
-            </div>
+            {engine ? (
+              <>
+                <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
+                  <engine.lead.icon size={24} />
+                </div>
+                <div>
+                  <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">{engine.id} // {engine.version}</div>
+                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{engine.name.replace('\n', ' ')}</h1>
+                </div>
+                <button
+                  onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
+                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors"
+                  title="Back to Navigator"
+                >
+                  <RefreshCw size={20} />
+                </button>
+              </>
+            ) : station ? (
+              <>
+                <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
+                  <station.icon size={24} />
+                </div>
+                <div>
+                  <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">Station // {station.id}</div>
+                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{station.name} Station</h1>
+                </div>
+                <button
+                  onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
+                  className="ml-4 p-2 text-fellini-ghost hover:text-fellini-accent transition-colors"
+                  title="Back to Navigator"
+                >
+                  <RefreshCw size={20} />
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 flex items-center justify-center border-2 border-fellini-black rounded-2xl bg-fellini-accent text-fellini-black shadow-xl">
+                  <Cpu size={24} />
+                </div>
+                <div>
+                  <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">SYSTEM ROOT // FORGE 3.0</div>
+                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">Bible Navigator</h1>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-12 text-right">
@@ -1147,56 +1522,290 @@ function ForgeDashboard() {
               className="max-w-6xl mx-auto"
             >
               {activeTab === 'Overview' && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                   <div className="space-y-12">
-                      <div>
-                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-6 flex items-center gap-4">
-                          <Terminal size={14} /> Mission Statement
+                engine ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                     <div className="space-y-12">
+                        <div>
+                          <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-6 flex items-center gap-4">
+                            <Terminal size={14} /> Mission Statement
+                            <div className="h-px grow bg-fellini-accent/20" />
+                          </div>
+                          <p className="font-serif italic text-3xl text-fellini-black leading-tight">
+                            "{engine.layers.identity.text}"
+                          </p>
+                        </div>
+
+                        <div className="bg-white border border-fellini-rule p-8 rounded-2xl shadow-sm">
+                          <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] mb-8">Operator Control HUD</div>
+                          <div className="flex items-center gap-6">
+                             <div className="w-12 h-12 rounded-full border border-fellini-rule flex items-center justify-center bg-fellini-bg">
+                                <User size={20} className="text-fellini-ghost" />
+                             </div>
+                             <div>
+                                <div className="font-mono text-[9px] text-fellini-ghost uppercase tracking-widest mb-1">Primary Operator</div>
+                                <div className="font-sans text-lg font-bold text-fellini-black uppercase tracking-tight">{engine.operator}</div>
+                             </div>
+                          </div>
+                        </div>
+                     </div>
+
+                     <div className="space-y-6">
+                        {userRole === 'roles/forge.line' && activeScenario && (
+                          <div className="bg-fellini-black rounded-3xl p-10 mb-8 border-4 border-fellini-accent animate-pulse shadow-2xl relative overflow-hidden">
+                             <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.5em] font-black mb-4 flex items-center gap-3">
+                                <Zap size={14} className="fill-current" /> Task Instruction // Priority One
+                             </div>
+                             <h3 className="font-sans text-3xl font-black text-white uppercase tracking-tighter mb-4 leading-tight">
+                                {activeScenario === 'COLD_CORE' ? 'RE-PROBE TO 75°C BEFORE PASS' : activeScenario === 'SOG_PEAK' ? 'DROP SMALLER BATCH — REFIRE' : activeScenario === 'FALSE_POSITIVE' ? 'PROBE AGAIN — CONFIRM 75°C BEFORE PASS' : activeScenario === 'LUNA_STARCH_FAIL' ? 'REJECT BATCH — START NEW' : activeScenario === 'LUNA_PURITY_FAIL' ? 'LOWER HEAT' : activeScenario === 'LUNA_STEAM_COLLAPSE' ? 'STRIP SURFACE MOISTURE' : activeScenario === 'LUNA_ENCLOSURE_BREACH' ? 'CHECK SEALS / DOOR' : activeScenario === 'LUNA_PATTERN_LEAD' ? 'REDUCE HEAT BASELINE' : activeScenario === 'BRIDGE_VISCOSITY_FAIL' ? 'ADJUST SAUCE — DO NOT SEND' : activeScenario === 'AETHER_DRIFT_FAIL' ? 'INCREASE VENTILATION — CLEAR AREA' : 'STATION MONITORING ACTIVE'}
+                             </h3>
+                             <div className="h-px bg-white/20 my-6" />
+                             <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                                Command Source: HELIOS // Recovery Brain Verified
+                             </p>
+                          </div>
+                        )}
+                        <div className="font-mono text-[10px] text-fellini-ghost uppercase tracking-[0.4em] mb-4">Core Item Sync</div>
+                        {engine?.items.map(dish => (
+                           <DishCard key={dish.id} dish={dish} onSelect={setSelectedDish} onPrint={handlePrint} />
+                        ))}
+                     </div>
+                  </div>
+                ) : station ? (
+                  <div className="space-y-12">
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {ENGINES.flatMap(e => e.items).filter(dish => {
+                           if (station.id === 'mains') return dish.id.startsWith('main') || dish.id === 'sun01' || dish.id === 'prep024';
+                           if (station.id === 'prep') return dish.id.startsWith('sup') || dish.id.startsWith('prep') && dish.id !== 'prep016' && dish.id !== 'prep024';
+                           if (station.id === 'dessert') return dish.id === 'prep016' || dish.id === 'prep032';
+                           if (station.id === 'fry') return dish.id === 'sun01';
+                           return false;
+                        }).map(dish => (
+                           <DishCard key={dish.id} dish={dish} onSelect={setSelectedDish} onPrint={handlePrint} />
+                        ))}
+                     </div>
+                  </div>
+                ) : (
+                  <div className="space-y-16">
+                     {/* Station Registry (Operational) */}
+                     <section>
+                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-10 flex items-center gap-4">
+                          <Layout size={14} /> Station Registry (Operational)
                           <div className="h-px grow bg-fellini-accent/20" />
                         </div>
-                        <p className="font-serif italic text-3xl text-fellini-black leading-tight">
-                          "{engine.layers.identity.text}"
-                        </p>
-                      </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                           {STATIONS.map((s, i) => (
+                              <motion.button
+                                key={s.id}
+                                whileHover={{ scale: 1.05, y: -4 }}
+                                onClick={() => setSelectedStationId(s.id)}
+                                className="bg-white border border-fellini-rule p-6 rounded-2xl flex flex-col items-center text-center shadow-sm hover:shadow-xl transition-all"
+                              >
+                                 <div className="w-12 h-12 bg-fellini-bg rounded-xl mb-4 flex items-center justify-center text-fellini-black">
+                                    <s.icon size={20} />
+                                 </div>
+                                 <div className="font-sans text-xs font-black uppercase tracking-tight text-fellini-black">{s.name}</div>
+                                 <div className="font-mono text-[8px] text-fellini-ghost uppercase mt-1">Lead: {s.lead}</div>
+                              </motion.button>
+                           ))}
+                        </div>
+                     </section>
 
-                      <div className="bg-white border border-fellini-rule p-8 rounded-2xl shadow-sm">
-                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] mb-8">Operator Control HUD</div>
-                        <div className="flex items-center gap-6">
-                           <div className="w-12 h-12 rounded-full border border-fellini-rule flex items-center justify-center bg-fellini-bg">
-                              <User size={20} className="text-fellini-ghost" />
+                     {/* Service & Pass Management */}
+                     <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="bg-white border border-fellini-rule p-8 rounded-3xl">
+                           <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
+                              <Bell size={14} /> Pass View // Authority Gate
                            </div>
-                           <div>
-                              <div className="font-mono text-[9px] text-fellini-ghost uppercase tracking-widest mb-1">Primary Operator</div>
-                              <div className="font-sans text-lg font-bold text-fellini-black uppercase tracking-tight">{engine.operator}</div>
+                           <div className="space-y-4">
+                              <div className="p-4 bg-fellini-bg rounded-xl border border-fellini-rule flex items-center justify-between">
+                                 <div>
+                                    <div className="font-sans text-xs font-bold text-fellini-black uppercase">Active AUTHORITY</div>
+                                    <div className="font-mono text-[9px] text-fellini-ghost uppercase">Bridge Law Multi-Engine Sync</div>
+                                 </div>
+                                 <div className="px-3 py-1 bg-fellini-black text-white font-mono text-[9px] rounded">ACTIVE</div>
+                              </div>
+                              <div className="p-4 border border-fellini-rule rounded-xl flex items-center gap-4 group hover:bg-fellini-bg transition-all">
+                                 <div className="w-10 h-10 rounded-lg bg-fellini-bg flex items-center justify-center text-fellini-ghost group-hover:text-fellini-accent transition-colors">
+                                    <CheckCircle size={20} />
+                                 </div>
+                                 <div className="flex-1">
+                                    <div className="font-sans text-xs font-bold text-fellini-black uppercase">Pass Submission Queue</div>
+                                    <div className="font-mono text-[9px] text-fellini-ghost uppercase tracking-widest">3 items pending validation</div>
+                                 </div>
+                                 <ArrowRight size={14} className="text-fellini-ghost group-hover:translate-x-1 transition-all" />
+                              </div>
                            </div>
                         </div>
-                      </div>
-                   </div>
 
-                   <div className="space-y-6">
-                      {userRole === 'roles/forge.line' && activeScenario && (
-                        <div className="bg-fellini-black rounded-3xl p-10 mb-8 border-4 border-fellini-accent animate-pulse shadow-2xl relative overflow-hidden">
-                           <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.5em] font-black mb-4 flex items-center gap-3">
-                              <Zap size={14} className="fill-current" /> Task Instruction // Priority One
+                        <div className="bg-white border border-fellini-rule p-8 rounded-3xl">
+                           <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
+                              <Zap size={14} /> Service Modes // Macro State
                            </div>
-                           <h3 className="font-sans text-3xl font-black text-white uppercase tracking-tighter mb-4 leading-tight">
-                              {activeScenario === 'COLD_CORE' ? 'RE-PROBE TO 75°C BEFORE PASS' : activeScenario === 'SOG_PEAK' ? 'DROP SMALLER BATCH — REFIRE' : activeScenario === 'FALSE_POSITIVE' ? 'PROBE AGAIN — CONFIRM 75°C BEFORE PASS' : activeScenario === 'LUNA_STARCH_FAIL' ? 'REJECT BATCH — START NEW' : activeScenario === 'LUNA_PURITY_FAIL' ? 'LOWER HEAT' : activeScenario === 'LUNA_STEAM_COLLAPSE' ? 'STRIP SURFACE MOISTURE' : activeScenario === 'LUNA_ENCLOSURE_BREACH' ? 'CHECK SEALS / DOOR' : activeScenario === 'LUNA_PATTERN_LEAD' ? 'REDUCE HEAT BASELINE' : activeScenario === 'BRIDGE_VISCOSITY_FAIL' ? 'ADJUST SAUCE — DO NOT SEND' : activeScenario === 'AETHER_DRIFT_FAIL' ? 'INCREASE VENTILATION — CLEAR AREA' : 'STATION MONITORING ACTIVE'}
-                           </h3>
-                           <div className="h-px bg-white/20 my-6" />
-                           <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest font-bold">
-                              Command Source: HELIOS // Recovery Brain Verified
-                           </p>
+                           <div className="grid grid-cols-2 gap-4">
+                              {['Prep Mode', 'Lunch Service', 'Dinner Service', 'Maintenance'].map((mode, i) => (
+                                 <button key={mode} className={`p-4 rounded-xl border font-sans text-[10px] font-bold uppercase tracking-widest transition-all ${i === 1 ? 'bg-fellini-accent border-fellini-accent text-fellini-black shadow-lg' : 'border-fellini-rule text-fellini-ghost hover:border-fellini-black'}`}>
+                                    {mode}
+                                 </button>
+                              ))}
+                           </div>
                         </div>
-                      )}
-                      <div className="font-mono text-[10px] text-fellini-ghost uppercase tracking-[0.4em] mb-4">Core Item Sync</div>
-                     {engine.items.map(dish => (
-                        <DishCard key={dish.id} dish={dish} onSelect={setSelectedDish} />
-                     ))}
-                   </div>
-                </div>
+                     </section>
+
+                     {/* Agent Registry */}
+                     <section>
+                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-10 flex items-center gap-4">
+                          <Users size={14} /> Agent Registry (Active Authorities)
+                          <div className="h-px grow bg-fellini-accent/20" />
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                           {AGENTS.map(agent => (
+                              <motion.div 
+                                key={agent.name}
+                                whileHover={{ y: -4 }}
+                                className="bg-white border border-fellini-rule p-6 rounded-2xl flex flex-col items-center text-center shadow-sm"
+                              >
+                                 <div 
+                                   className="w-12 h-12 rounded-full mb-4 flex items-center justify-center text-white shadow-inner"
+                                   style={{ backgroundColor: agent.color }}
+                                 >
+                                    <div className="font-black text-xs">{agent.name[0]}</div>
+                                 </div>
+                                 <div className="font-mono text-[10px] text-fellini-black font-black tracking-widest uppercase mb-1">{agent.name}</div>
+                                 <div className="font-sans text-[8px] text-fellini-ghost uppercase tracking-tighter">Authority: {agent.engineId.toUpperCase()}</div>
+                                 <div className="mt-4 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-fellini-green animate-pulse" />
+                                    <span className="font-mono text-[7px] text-fellini-green uppercase font-black">Online</span>
+                                 </div>
+                              </motion.div>
+                           ))}
+                        </div>
+                     </section>
+
+                     {/* Bible (Recipe Registry) */}
+                     <section>
+                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-10 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
+                             <BookOpen size={14} /> Recipe Registry (The Bible)
+                          </div>
+                          <div className="relative">
+                             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fellini-ghost" />
+                             <input 
+                               type="text" 
+                               placeholder="SEARCH LAWS / RECIPES..." 
+                               className="bg-fellini-bg border border-fellini-rule rounded-xl pl-10 pr-4 py-2 font-mono text-[10px] w-64 focus:outline-none focus:border-fellini-accent transition-colors"
+                             />
+                          </div>
+                          <div className="h-px grow bg-fellini-accent/20" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                           {ENGINES.flatMap(e => e.items).map(dish => (
+                              <DishCard key={dish.id} dish={dish} onSelect={setSelectedDish} onPrint={handlePrint} />
+                           ))}
+                        </div>
+                     </section>
+
+                     {/* Engine Registry */}
+                     <section>
+                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.6em] mb-10 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
+                             <Layers size={14} /> Engine Registry (The Bible)
+                          </div>
+                          <div className="flex items-center gap-4 bg-fellini-bg p-1 rounded-xl border border-fellini-rule">
+                             {['ALL', 'PEAK', 'PREP'].map(f => (
+                                <button
+                                  key={f}
+                                  onClick={() => setSystemMode(f === 'ALL' ? 'PRECISION' : f)}
+                                  className={`px-4 py-1.5 rounded-lg font-mono text-[9px] uppercase tracking-widest transition-all ${((f === 'ALL' && systemMode === 'PRECISION') || systemMode === f) ? 'bg-fellini-black text-white' : 'text-fellini-ghost hover:text-fellini-black'}`}
+                                >
+                                   {f}
+                                </button>
+                             ))}
+                          </div>
+                          <div className="h-px grow bg-fellini-accent/20" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                           {ENGINES.filter(e => {
+                              if (systemMode === 'PEAK') return e.id !== 'supply';
+                              if (systemMode === 'PREP') return e.id === 'supply' || e.id === 'luna';
+                              return true;
+                           }).map(e => (
+                              <motion.button
+                                key={e.id}
+                                whileHover={{ scale: 1.02, y: -4 }}
+                                onClick={() => setSelectedEngineId(e.id)}
+                                className="bg-white border border-fellini-rule p-10 rounded-3xl text-left shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative"
+                              >
+                                 <div className="absolute top-0 right-0 p-8 font-mono text-4xl text-fellini-bg font-black -mr-4 -mt-4 pointer-events-none group-hover:text-fellini-accent/10 transition-colors">
+                                    {e.num}
+                                 </div>
+                                 <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className="w-14 h-14 bg-fellini-bg rounded-2xl flex items-center justify-center text-fellini-black group-hover:bg-fellini-accent group-hover:text-fellini-black transition-colors shadow-sm">
+                                       <e.lead.icon size={24} />
+                                    </div>
+                                 </div>
+                                 <h3 className="font-sans text-3xl font-black text-fellini-black uppercase tracking-tighter mb-2 group-hover:text-fellini-accent transition-colors">{e.name.replace('\n', ' ')}</h3>
+                                 <p className="font-sans text-[10px] text-fellini-accent font-black uppercase tracking-[0.2em] mb-6">{e.version} // {e.operator}</p>
+                                 <div className="font-serif italic text-lg text-fellini-black/60 leading-tight">
+                                    "{e.layers.identity.text}"
+                                 </div>
+                                 <div className="mt-10 pt-6 border-t border-fellini-rule flex items-center justify-between group-hover:border-fellini-accent/30 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                       <span className="font-mono text-[9px] text-fellini-accent uppercase tracking-[0.3em] font-black">Enter System</span>
+                                       <ArrowRight size={14} className="text-fellini-accent group-hover:translate-x-2 transition-transform" />
+                                    </div>
+                                    <div className="flex -space-x-2">
+                                       {[1,2,3].map(i => (
+                                          <div key={i} className="w-4 h-4 rounded-full border-2 border-white bg-fellini-bg" />
+                                       ))}
+                                    </div>
+                                 </div>
+                              </motion.button>
+                           ))}
+                        </div>
+                     </section>
+
+                     {/* Global State Monitor */}
+                     <section className="bg-fellini-black rounded-[2.5rem] p-16 border border-fellini-rule relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-16 opacity-5 pointer-events-none">
+                           <Layout size={300} className="text-fellini-accent" />
+                        </div>
+                        <div className="relative z-10">
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                              <div>
+                                 <div className="font-mono text-xs text-fellini-accent uppercase tracking-[0.4em] font-black mb-8">Global System Integration</div>
+                                 <h2 className="font-sans text-5xl font-black text-white uppercase tracking-tighter mb-8 leading-[0.9]">FORGE v3.0 // Master Pulse</h2>
+                                 <p className="font-serif italic text-xl text-white/50 leading-relaxed mb-12">
+                                    "The Bible is not a set of recipes; it is the deterministic logic governing the physical transformation of ingredients. One engine fails, the system drifts. One agent offline, authority collapses."
+                                 </p>
+                                 <div className="grid grid-cols-2 gap-8">
+                                    <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
+                                       <div className="font-mono text-[9px] text-fellini-ghost uppercase mb-2">Total Node Count</div>
+                                       <div className="font-sans text-3xl font-black text-white">42 Active</div>
+                                    </div>
+                                    <div className="p-6 bg-white/5 border border-white/10 rounded-2xl">
+                                       <div className="font-mono text-[9px] text-fellini-ghost uppercase mb-2">Global Integrity</div>
+                                       <div className="font-sans text-3xl font-black text-fellini-green">98.4%</div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div className="flex flex-col justify-center">
+                                 <div className="space-y-4">
+                                    {['Memory Engine: ONLINE', 'Jemma Validator: ACTIVE', 'Aether extraction: OPTIMAL', 'Helios thermal: NOMINAL'].map(line => (
+                                       <div key={line} className="flex items-center gap-4 group">
+                                          <div className="w-12 h-px bg-fellini-accent group-hover:w-20 transition-all" />
+                                          <div className="font-mono text-xs text-white uppercase tracking-widest">{line}</div>
+                                       </div>
+                                    ))}
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </section>
+                  </div>
+                )
               )}
 
-              {activeTab === 'Laws' && (
+              {activeTab === 'Laws' && engine && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    {engine.layers.executionLaws.map((law, idx) => (
                       <div key={idx} className="bg-white border border-fellini-rule p-10 rounded-2xl group hover:shadow-xl transition-all h-full">
@@ -1212,7 +1821,7 @@ function ForgeDashboard() {
                 </div>
               )}
 
-              {activeTab === 'WMM' && (
+              {activeTab === 'WMM' && engine && (
                 <div className="bg-white border border-fellini-rule rounded-2xl overflow-hidden shadow-sm">
                    <div className="divide-y divide-fellini-rule">
                       {engine.layers.wmm.map((item, idx) => (
@@ -1226,14 +1835,14 @@ function ForgeDashboard() {
                 </div>
               )}
 
-              {activeTab === 'Allergen' && (
+              {activeTab === 'Allergen' && (engine || station) && (
                 <div className="bg-white border border-fellini-rule rounded-3xl p-16 flex flex-col items-center text-center">
                    <ShieldAlert size={80} className="text-fellini-red mb-8 animate-pulse" />
                    <h2 className="font-sans text-5xl font-black text-fellini-red uppercase tracking-tighter mb-4">The Allergen Gate</h2>
                    <div className="font-mono text-xs text-fellini-red/60 uppercase tracking-widest mb-12">Protocol Locked · v2.8.1</div>
                    
                    <div className="max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-16">
-                      {engine.layers.allergenGate.highRisk.map(risk => (
+                      {((engine ? engine.layers.allergenGate.highRisk : [])).map(risk => (
                          <div key={risk} className="bg-fellini-bg border border-fellini-rule p-4 font-mono text-sm text-fellini-red font-black uppercase tracking-widest rounded-xl">
                             {risk}
                          </div>
@@ -1242,13 +1851,13 @@ function ForgeDashboard() {
 
                    <div className="bg-white border border-fellini-rule p-8 rounded-2xl max-w-xl shadow-lg">
                       <p className="font-serif italic text-2xl text-slate-800 leading-snug">
-                        "{engine.layers.allergenGate.protocol}"
+                        "{engine ? engine.layers.allergenGate.protocol : "STATION PROTOCOL: Verify all inputs against master registry."}"
                       </p>
                    </div>
                 </div>
               )}
 
-              {activeTab === 'GP' && (
+              {activeTab === 'GP' && engine && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                    <div className="bg-white border border-fellini-rule p-12 rounded-3xl flex flex-col justify-center items-center text-center relative overflow-hidden group">
                       <div className="absolute inset-x-0 bottom-0 h-1 bg-fellini-green origin-left" />
@@ -1268,10 +1877,10 @@ function ForgeDashboard() {
                 </div>
               )}
 
-              {activeTab === 'Recovery' && (
+              {activeTab === 'Recovery' && (engine || station) && (
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                      <div className="lg:col-span-2 space-y-8">
-                        {engine.layers.recoveryLinks.map((link, idx) => (
+                        {(engine ? engine.layers.recoveryLinks : []).map((link, idx) => (
                            <div key={idx} className="bg-white border border-fellini-rule rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row group">
                               <div className="bg-white p-10 md:w-80 flex flex-col justify-center border-b md:border-b-0 md:border-r border-fellini-rule text-center">
                                  <div className="font-mono text-[9px] text-fellini-red uppercase tracking-widest mb-2 font-bold">Breach Signature</div>
@@ -1407,7 +2016,7 @@ function ForgeDashboard() {
                 </div>
               )}
 
-              {activeTab === 'Print' && (
+              {activeTab === 'Print' && engine && (
                 <div className="bg-white border-4 border-fellini-black p-16 max-w-2xl mx-auto shadow-2xl relative">
                    <div className="absolute top-8 right-8">
                       <Printer size={40} className="text-fellini-black opacity-10" />
@@ -1441,11 +2050,20 @@ function ForgeDashboard() {
                     <div className="font-mono text-xs text-fellini-accent uppercase tracking-widest font-black mb-2">{selectedDish.tag}</div>
                     <h2 className="text-5xl font-black text-fellini-black uppercase tracking-tighter leading-none">{selectedDish.title}</h2>
                  </div>
-                 <button onClick={() => setSelectedDish(null)} className="p-4 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center">
-                    <XCircle size={24} />
-                 </button>
+                 <div className="flex gap-4">
+                    <button 
+                      onClick={() => handlePrint(selectedDish)} 
+                      className="p-4 bg-fellini-accent text-fellini-black hover:scale-110 transition-all rounded-full flex items-center justify-center shadow-lg"
+                      title="Print Card"
+                    >
+                       <Printer size={24} />
+                    </button>
+                    <button onClick={() => setSelectedDish(null)} className="p-4 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center">
+                       <XCircle size={24} />
+                    </button>
+                 </div>
               </header>
-              <div className="flex-1 overflow-y-auto p-12 space-y-12 bg-white">
+              <div className="flex-1 overflow-y-auto p-12 space-y-16 bg-white">
                  <div className="font-serif italic text-3xl text-fellini-black leading-tight border-l-8 border-fellini-accent pl-10">"{selectedDish.signal}"</div>
                  
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -1477,6 +2095,141 @@ function ForgeDashboard() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* --- Print-Only Specification Card --- */}
+      {printedDish && (
+        <div id="print-section" className="hidden print:block fixed inset-0 bg-white text-black p-12 z-[9999]">
+           <div className="border-4 border-black p-8 h-full flex flex-col">
+              <div className="flex justify-between items-start border-b-4 border-black pb-6 mb-8">
+                 <div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.4em] font-black mb-2 text-slate-500">Galyons Master Bible // Recipe Card</div>
+                    <h1 className="font-sans text-5xl font-black uppercase tracking-tighter m-0">{printedDish.title}</h1>
+                    <div className="font-mono text-sm font-bold mt-2">{printedDish.id} // {printedDish.tag}</div>
+                 </div>
+                 <div className="text-right">
+                    <div className="font-mono text-[10px] uppercase font-black mb-1">Station Authority</div>
+                    <div className="font-sans font-black text-2xl uppercase">
+                      {STATIONS.find(s => {
+                         if (printedDish.id.startsWith('main')) return s.id === 'mains';
+                         if (printedDish.id.startsWith('sup')) return s.id === 'prep';
+                         if (printedDish.id === 'sun01' || printedDish.id === 'prep024') return s.id === 'mains';
+                         return s.id === 'prep';
+                      })?.name || 'GENERIC'}
+                    </div>
+                    <div className="mt-2 text-right">
+                      <div className="font-mono text-[10px] uppercase font-black mb-1">Engine Source</div>
+                      <div className="font-sans font-black text-sm uppercase">
+                        {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.name.replace('\n', ' ') || 'MASTER'}
+                      </div>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-12 mb-12 flex-1">
+                 <div className="space-y-8">
+                    <section>
+                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">WMM / Yield / Metadata</h2>
+                       <div className="grid grid-cols-2 gap-4">
+                          {printedDish.meta.map((m, i) => (
+                             <div key={i}>
+                                <div className="font-mono text-[9px] uppercase text-slate-500">{m.label}</div>
+                                <div className="font-sans text-sm font-bold uppercase">{m.value}</div>
+                             </div>
+                          ))}
+                          <div>
+                             <div className="font-mono text-[9px] uppercase text-slate-500">Status</div>
+                             <div className="font-sans text-sm font-bold uppercase">{printedDish.meta.find(m => m.label === 'Status')?.value || 'VERIFIED'}</div>
+                          </div>
+                          <div>
+                             <div className="font-mono text-[9px] uppercase text-slate-500">Founder Law</div>
+                             <div className="font-sans text-sm font-bold uppercase">{printedDish.founderLawLocked ? 'LOCKED' : 'BETA'}</div>
+                          </div>
+                       </div>
+                    </section>
+
+                    <section>
+                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Technical Spec</h2>
+                       <div className="space-y-3">
+                          {Object.entries(printedDish.fullSpec).map(([k, v]) => (
+                             <div key={k} className="flex justify-between items-baseline gap-4">
+                                <span className="font-mono text-[10px] uppercase text-slate-500 whitespace-nowrap">{k}</span>
+                                <span className="font-sans text-xs font-bold text-right leading-tight">{v}</span>
+                             </div>
+                          ))}
+                       </div>
+                    </section>
+                    
+                    <section>
+                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Signals & Recovery</h2>
+                       <div className="space-y-4">
+                          <div>
+                             <div className="font-mono text-[9px] uppercase text-slate-500">Release Signals (Pass Authority)</div>
+                             <ul className="list-disc list-inside font-sans text-xs font-medium italic">
+                                {printedDish.passSignals?.map((s, i) => <li key={i}>{s}</li>)}
+                                {!printedDish.passSignals && <li>Visual verification by Station Master</li>}
+                             </ul>
+                          </div>
+                          <div>
+                             <div className="font-mono text-[9px] uppercase text-slate-500">Reject Boundary (Fail Protocol)</div>
+                             <div className="font-sans text-xs font-bold uppercase text-red-600">{printedDish.reject}</div>
+                          </div>
+                          <div>
+                             <div className="font-mono text-[9px] uppercase text-slate-500">Max Recovery</div>
+                             <div className="font-sans text-xs font-bold uppercase">{printedDish.maxRecovery || 'NO RECOVERY — REJECT ONLY'}</div>
+                          </div>
+                       </div>
+                    </section>
+                 </div>
+
+                 <div className="space-y-8 border-l-2 border-black pl-12">
+                    <section>
+                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Method Logic</h2>
+                       <div className="space-y-4">
+                          {printedDish.method.map((m, i) => (
+                             <div key={i} className="flex gap-4">
+                                <span className="font-mono text-xs font-bold">{i + 1}.</span>
+                                <p className="font-sans text-sm leading-snug">{m}</p>
+                             </div>
+                          ))}
+                       </div>
+                    </section>
+                    
+                    <section className="bg-slate-100 p-6 rounded border-2 border-black">
+                       <h2 className="font-mono text-[10px] uppercase font-black mb-2">Critical Note / Jemma Mapping</h2>
+                       <p className="font-serif italic text-base leading-tight mb-4">"{printedDish.criticalNote}"</p>
+                       <div className="font-mono text-[8px] uppercase font-black text-slate-500">Validator Ref: {printedDish.fullSpec.Jemma || 'DEFAULT_GATE'}</div>
+                    </section>
+                 </div>
+              </div>
+
+              <div className="mt-auto pt-8 border-t-2 border-black flex justify-between items-end opacity-40">
+                 <div className="font-mono text-[8px] uppercase tracking-widest">Printed via Galyons Forge v3.0 // Master Pulse // System Time: {new Date().toLocaleString()}</div>
+                 <div className="font-mono text-[10px] font-black px-4 py-1 border-2 border-black">AUTHENTIC BIBLE COPY</div>
+              </div>
+           </div>
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          body > * {
+            display: none !important;
+          }
+          #print-section {
+            display: block !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 2cm !important;
+          }
+          aside, header, main, .RecoveryCommandCenter {
+            display: none !important;
+          }
+        }
+      `}} />
     </div>
   );
 }
@@ -1498,10 +2251,10 @@ export default function App() {
             GALYONS — RODZ 2026 SYSTEM KERNEL
           </span>
           <h1 className="font-sans text-6xl md:text-8xl font-bold tracking-tight text-fellini-black uppercase leading-tight mb-6">
-            FELLINI MASTER BIBLE v2.9.0
+            FELLINI MASTER BIBLE v2.9.2
           </h1>
           <div className="font-mono text-[11px] text-fellini-accent mb-12 tracking-[0.3em]">
-            v2.9.0.INTEL · Octagon Engine Active · Adaptive Authority Locked
+            v2.9.2.STABLE · Octagon Engine Active · Adaptive Authority Locked
           </div>
           <button 
             onClick={() => setIsEntered(true)}
