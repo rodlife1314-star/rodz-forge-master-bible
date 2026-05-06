@@ -198,6 +198,11 @@ interface Dish {
   signal: string;
   meta: { label: string; value: string; hi?: boolean }[];
   fullSpec: Record<string, string>;
+  wmm?: {
+    weights: string[];
+    measures: string[];
+    method: string[];
+  };
   method: string[];
   criticalNote: string;
   reject: string;
@@ -346,6 +351,11 @@ const ENGINES: Engine[] = [
           "Time Law": "12-24h (Fail >26h)",
           "Jemma": "REDUCTION DRIFT / EXTRACTION FAILURE"
         },
+        wmm: {
+          weights: ["Bones: 5.00kg", "Mirepoix: 1.20kg", "Tomato Paste: 0.15kg"],
+          measures: ["Wine: 750ml", "Water: 15.00L", "Oil: 100ml"],
+          method: ["Roast 220°C / 45m", "Deglaze / Scrape", "Simmer 92°C / 24h", "Fine Strain / Reduce"]
+        },
         method: [
           "Roast bones at 220°C.",
           "Caramelise mirepoix/tomato paste.",
@@ -381,6 +391,11 @@ const ENGINES: Engine[] = [
           "Thermal": "<8°C rise during prep",
           "Jemma": "EMULSION LOCK FAILURE / PURITY BREACH"
         },
+        wmm: {
+          weights: ["Yolks: 250g", "Mustard: 50g", "Salt: 10g"],
+          measures: ["Oil: 2.00L", "Lemon Juice: 50ml", "Vinegar: 30ml"],
+          method: ["Whisk Base", "Stream Oil (Micro)", "Adjust Acid", "Chill <4°C"]
+        },
         method: [
           "Whisk yolks and mustard.",
           "Slow micro-stream oil (prevent yolk saturation).",
@@ -413,6 +428,11 @@ const ENGINES: Engine[] = [
           "Thermal": "Must reach 104°C (Fail >106°C)",
           "Caramel": "Rich roasted aroma",
           "Jemma": "THERMAL DRIFT / EMULSION FAILURE"
+        },
+        wmm: {
+          weights: ["Butter: 500g", "Brown Sugar: 1.00kg", "Salt: 5g"],
+          measures: ["Double Cream: 1.50L", "Vanilla: 20ml"],
+          method: ["Melt / Caramelise", "Hit 104°C exactly", "Deglaze w/ Cream", "Whisk Glossy"]
         },
         method: [
           "Melt butter and sugar.",
@@ -2131,7 +2151,7 @@ function ForgeDashboard() {
               <div className="grid grid-cols-2 gap-12 mb-12 flex-1">
                  <div className="space-y-8">
                     <section>
-                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">WMM / Yield / Metadata</h2>
+                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Metadata / Yield</h2>
                        <div className="grid grid-cols-2 gap-4">
                           {printedDish.meta?.map((m, i) => (
                              <div key={i}>
@@ -2151,6 +2171,37 @@ function ForgeDashboard() {
                     </section>
 
                     <section>
+                     {printedDish.wmm && (
+                       <section className="print-section">
+                         <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">WMM — Weights / Measures / Method</h2>
+                         <div className="grid grid-cols-3 gap-6">
+                           <div className="border-r border-black pr-4">
+                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Weights</h4>
+                             <ul className="space-y-1">
+                               {printedDish.wmm.weights.map((item, index) => (
+                                 <li key={`weight-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{item}</li>
+                               ))}
+                             </ul>
+                           </div>
+                           <div className="border-r border-black pr-4">
+                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Measures</h4>
+                             <ul className="space-y-1">
+                               {printedDish.wmm.measures.map((item, index) => (
+                                 <li key={`measure-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{item}</li>
+                               ))}
+                             </ul>
+                           </div>
+                           <div>
+                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Method Block</h4>
+                             <ul className="space-y-1">
+                               {printedDish.wmm.method.map((step, index) => (
+                                 <li key={`method-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{step}</li>
+                               ))}
+                             </ul>
+                           </div>
+                         </div>
+                       </section>
+                     )}
                        <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Technical Spec</h2>
                        <div className="space-y-3">
                           {printedDish.fullSpec && Object.entries(printedDish.fullSpec).map(([k, v]) => (
@@ -2231,6 +2282,11 @@ function ForgeDashboard() {
         @media print {
           .no-print {
             display: none !important;
+          }
+          .print-section,
+          .print-section * {
+            display: block !important;
+            visibility: visible !important;
           }
           #print-section {
             display: block !important;
