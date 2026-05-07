@@ -1247,10 +1247,10 @@ function DishCard(props: { dish: Dish; onSelect: (d: Dish | null) => void; onPri
            {onPrint && (
              <button 
                onClick={(e) => { e.stopPropagation(); onPrint(dish); }}
-               className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost hover:text-fellini-accent transition-colors no-print"
+               className="bg-fellini-bg p-3 md:p-2 rounded-lg text-fellini-ghost hover:text-fellini-accent transition-colors no-print min-w-[44px] min-h-[44px] flex items-center justify-center"
                title="Print Recipe Card"
              >
-               <Printer size={16} />
+               <Printer size={20} />
              </button>
            )}
            <div className="bg-fellini-bg p-2 rounded-lg text-fellini-ghost group-hover:text-fellini-accent transition-colors">
@@ -1275,18 +1275,18 @@ function RecoveryCommandCenter() {
   const [active, setActive] = useState(false);
   
   return (
-    <div className="fixed bottom-8 right-8 z-[100]">
+    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[100] no-print">
       <motion.button 
         onClick={() => setActive(!active)}
-        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all ${active ? 'bg-fellini-red' : 'bg-fellini-black'}`}
+        className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center shadow-2xl transition-all ${active ? 'bg-fellini-red' : 'bg-fellini-black'}`}
       >
-        <ActivityIcon className="text-white" size={24} />
+        <ActivityIcon className="text-white" size={window.innerWidth < 768 ? 20 : 24} />
       </motion.button>
     </div>
   );
 }
 
-function ForgeDashboard() {
+function ForgeDashboard({ onPrintSet, printedDish }: { onPrintSet: (dish: Dish | null) => void, printedDish: Dish | null }) {
   const [activeTab, setActiveTab] = useState('Overview');
   const [selectedEngineId, setSelectedEngineId] = useState<string | null>(null);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
@@ -1296,14 +1296,10 @@ function ForgeDashboard() {
   const [activeScenario, setActiveScenario] = useState<StressScenario>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
-  const [printedDish, setPrintedDish] = useState<Dish | null>(null);
 
   const handlePrint = (dish: Dish) => {
-    setPrintedDish(dish);
-    // Give state time to update for the printable section
-    setTimeout(() => {
-      window.print();
-    }, 100);
+    console.log("[PRINT_ICON_CLICKED]", dish?.id, dish?.title);
+    onPrintSet(dish);
   };
 
   useEffect(() => {
@@ -1329,17 +1325,17 @@ function ForgeDashboard() {
   });
 
   return (
-    <div className="flex h-screen bg-fellini-bg overflow-hidden font-sans select-none">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen bg-fellini-bg overflow-y-auto md:overflow-hidden font-sans select-none relative w-full max-w-full box-border">
       <div className="scanline-overlay pointer-events-none fixed inset-0 z-50 opacity-10" />
       
       {/* Sidebar Navigation */}
-      <aside className="w-80 border-r border-fellini-rule bg-white flex flex-col z-40">
+      <aside className={`w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-fellini-rule shrink-0 ${selectedEngineId || selectedStationId ? 'hidden md:flex' : 'flex'} flex-col relative h-auto md:h-full z-40`}>
         <div className="p-8 border-b border-fellini-rule">
            <div className="font-sc text-xl tracking-[0.3em] text-fellini-black uppercase font-bold mb-1">Forge Bible</div>
            <div className="font-mono text-[9px] text-fellini-ghost tracking-[0.2em] uppercase">v2.9.2.STABLE // Observation Engine</div>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-6">
+        <div className="md:flex-1 md:overflow-y-auto py-6">
           <div className="px-8 pb-6 mb-6 border-b border-fellini-rule">
             <button
               onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
@@ -1403,18 +1399,18 @@ function ForgeDashboard() {
       </aside>
 
       {/* Main Command Center */}
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-white/30">
+      <main className="flex-1 flex flex-col w-full min-w-0 h-auto md:h-full overflow-hidden bg-white/30 relative">
         {/* Header Bar */}
-        <header className="h-32 border-b border-fellini-rule flex items-center justify-between px-12 bg-white backdrop-blur-md z-30">
-          <div className="flex items-center gap-8">
+        <header className="h-24 md:h-32 border-b border-fellini-rule flex items-center justify-between px-4 md:px-12 bg-white backdrop-blur-md z-30 shrink-0">
+          <div className="flex items-center gap-4 md:gap-8 overflow-hidden">
             {engine ? (
               <>
-                <div className="w-16 h-16 flex items-center justify-center border border-fellini-rule rounded-2xl bg-fellini-bg text-fellini-black">
-                  {engine.lead?.icon && <engine.lead.icon size={24} />}
+                <div className="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center border border-fellini-rule rounded-xl md:rounded-2xl bg-fellini-bg text-fellini-black shrink-0">
+                  {engine.lead?.icon && <engine.lead.icon size={window.innerWidth < 768 ? 16 : 24} />}
                 </div>
-                <div>
-                  <div className="font-mono text-xs text-fellini-accent tracking-[0.4em] uppercase font-bold mb-1">{engine.id} // {engine.version}</div>
-                  <h1 className="font-sans text-4xl font-black text-fellini-black tracking-tighter uppercase">{engine.name?.replace('\n', ' ')}</h1>
+                <div className="min-w-0">
+                  <div className="font-mono text-[8px] md:text-xs text-fellini-accent tracking-[0.2em] md:tracking-[0.4em] uppercase font-bold mb-0.5 md:mb-1 truncate">{engine.id} // {engine.version}</div>
+                  <h1 className="font-sans text-lg md:text-4xl font-black text-fellini-black tracking-tighter uppercase truncate">{engine.name?.replace('\n', ' ')}</h1>
                 </div>
                 <button
                   onClick={() => { setSelectedEngineId(null); setSelectedStationId(null); }}
@@ -1518,12 +1514,12 @@ function ForgeDashboard() {
         </header>
 
         {/* Tab Navigation */}
-        <nav className="h-16 border-b border-fellini-rule flex items-center px-8 bg-white/50 backdrop-blur-sm z-30">
+        <nav className="h-14 md:h-16 border-b border-fellini-rule flex items-center px-4 md:px-8 bg-white/50 backdrop-blur-sm z-30 overflow-x-auto no-scrollbar shrink-0">
           {tabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 h-full font-mono text-[10px] tracking-[0.3em] uppercase transition-all relative border-r border-fellini-rule ${activeTab === tab ? 'text-fellini-black font-extrabold bg-white' : 'text-fellini-ghost hover:text-fellini-black hover:bg-fellini-black/5'}`}
+              className={`px-4 md:px-8 h-full font-mono text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase transition-all relative border-r border-fellini-rule whitespace-nowrap ${activeTab === tab ? 'text-fellini-black font-extrabold bg-white' : 'text-fellini-ghost hover:text-fellini-black hover:bg-fellini-black/5'}`}
             >
               {tab}
               {activeTab === tab && <motion.div layoutId="tab-line" className="absolute bottom-0 left-0 right-0 h-1 bg-fellini-accent" />}
@@ -1532,7 +1528,7 @@ function ForgeDashboard() {
         </nav>
 
         {/* Tab Content Area */}
-        <div className="flex-1 overflow-y-auto p-12 data-grid-bg relative custom-scrollbar">
+        <div className="flex-1 md:overflow-y-auto p-4 md:p-12 data-grid-bg relative custom-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab + selectedEngineId}
@@ -1856,10 +1852,10 @@ function ForgeDashboard() {
               )}
 
               {activeTab === 'Allergen' && (engine || station) && (
-                <div className="bg-white border border-fellini-rule rounded-3xl p-16 flex flex-col items-center text-center">
-                   <ShieldAlert size={80} className="text-fellini-red mb-8 animate-pulse" />
-                   <h2 className="font-sans text-5xl font-black text-fellini-red uppercase tracking-tighter mb-4">The Allergen Gate</h2>
-                   <div className="font-mono text-xs text-fellini-red/60 uppercase tracking-widest mb-12">Protocol Locked · v2.8.1</div>
+                <div className="bg-white border border-fellini-rule rounded-2xl md:rounded-3xl p-6 md:p-16 flex flex-col items-center text-center">
+                   <ShieldAlert size={window.innerWidth < 768 ? 48 : 80} className="text-fellini-red mb-4 md:mb-8 animate-pulse" />
+                   <h2 className="font-sans text-3xl md:text-5xl font-black text-fellini-red uppercase tracking-tighter mb-4">The Allergen Gate</h2>
+                   <div className="font-mono text-[10px] md:text-xs text-fellini-red/60 uppercase tracking-widest mb-8 md:mb-12">Protocol Locked · v2.8.1</div>
                    
                    <div className="max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-16">
                       {((engine ? engine.layers.allergenGate.highRisk : [])).map(risk => (
@@ -1878,14 +1874,14 @@ function ForgeDashboard() {
               )}
 
               {activeTab === 'GP' && engine && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                   <div className="bg-white border border-fellini-rule p-12 rounded-3xl flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+                   <div className="bg-white border border-fellini-rule p-8 md:p-12 rounded-2xl md:rounded-3xl flex flex-col justify-center items-center text-center relative overflow-hidden group">
                       <div className="absolute inset-x-0 bottom-0 h-1 bg-fellini-green origin-left" />
-                      <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-[0.5em] mb-12 flex items-center gap-4">
+                      <div className="font-mono text-[9px] md:text-[10px] text-fellini-accent uppercase tracking-[0.4em] md:tracking-[0.5em] mb-8 md:mb-12 flex items-center gap-4">
                         <PieChart size={14} /> Profit Mirror
                       </div>
-                      <div className="text-8xl font-black text-fellini-black tracking-tighter mb-4">{engine.layers.gpControl.targetMargin}</div>
-                      <div className="font-mono text-xs text-fellini-ghost uppercase tracking-[0.3em]">Vertical Target Lock</div>
+                      <div className="text-6xl md:text-8xl font-black text-fellini-black tracking-tighter mb-4">{engine.layers.gpControl.targetMargin}</div>
+                      <div className="font-mono text-[10px] md:text-xs text-fellini-ghost uppercase tracking-[0.3em]">Vertical Target Lock</div>
                    </div>
 
                    <div className="space-y-8">
@@ -2065,31 +2061,37 @@ function ForgeDashboard() {
       {/* --- Global Modal --- */}
       <AnimatePresence>
         {selectedDish && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-12">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedDish(null)} className="absolute inset-0 bg-fellini-black/95 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="w-full max-w-4xl max-h-[85vh] bg-white border border-fellini-rule relative z-10 flex flex-col shadow-2xl overflow-hidden rounded-3xl">
-              <header className="p-10 border-b border-fellini-rule flex justify-between items-center bg-fellini-bg">
-                 <div>
-                    <div className="font-mono text-xs text-fellini-accent uppercase tracking-widest font-black mb-2">{selectedDish.tag}</div>
-                    <h2 className="text-5xl font-black text-fellini-black uppercase tracking-tighter leading-none">{selectedDish.title}</h2>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="w-full max-w-4xl max-h-[95vh] md:max-h-[85vh] bg-white border border-fellini-rule relative z-10 flex flex-col shadow-2xl overflow-hidden rounded-2xl md:rounded-3xl">
+              <header className="p-6 md:p-10 border-b border-fellini-rule flex flex-col md:flex-row md:justify-between md:items-center bg-fellini-bg shrink-0">
+                 <div className="mb-4 md:mb-0">
+                    <div className="font-mono text-[10px] md:text-xs text-fellini-accent uppercase tracking-widest font-black mb-1 md:mb-2">{selectedDish.tag}</div>
+                    <h2 className="text-3xl md:text-5xl font-black text-fellini-black uppercase tracking-tighter leading-tight md:leading-none">{selectedDish.title}</h2>
                  </div>
-                 <div className="flex gap-4">
+                 <div className="flex gap-4 self-end md:self-auto">
                     <button 
                       onClick={() => handlePrint(selectedDish)} 
-                      className="p-4 bg-fellini-accent text-fellini-black hover:scale-110 transition-all rounded-full flex items-center justify-center shadow-lg no-print"
+                      className="w-12 h-12 md:w-14 md:h-14 bg-fellini-accent text-fellini-black hover:scale-110 transition-all rounded-full flex items-center justify-center shadow-lg no-print"
                       title="Print Card"
                     >
-                       <Printer size={24} />
+                       <Printer size={window.innerWidth < 768 ? 20 : 24} />
                     </button>
-                    <button onClick={() => setSelectedDish(null)} className="p-4 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center no-print">
-                       <XCircle size={24} />
+                    <button 
+                      onClick={() => { setPrintedDish(selectedDish); setPrintViewActive(true); }}
+                      className="hidden md:flex h-12 md:h-14 px-6 md:px-8 bg-slate-100 text-slate-800 font-mono text-[10px] font-black uppercase items-center justify-center rounded-full border border-slate-200 hover:bg-slate-200 transition-all no-print"
+                    >
+                       Full Print View
+                    </button>
+                    <button onClick={() => setSelectedDish(null)} className="w-12 h-12 md:w-14 md:h-14 bg-fellini-black text-white hover:scale-110 transition-all rounded-full flex items-center justify-center no-print">
+                       <XCircle size={window.innerWidth < 768 ? 20 : 24} />
                     </button>
                  </div>
               </header>
-              <div className="flex-1 overflow-y-auto p-12 space-y-16 bg-white">
-                 <div className="font-serif italic text-3xl text-fellini-black leading-tight border-l-8 border-fellini-accent pl-10">"{selectedDish.signal}"</div>
+              <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 md:space-y-16 bg-white">
+                 <div className="font-serif italic text-xl md:text-3xl text-fellini-black leading-tight border-l-4 md:border-l-8 border-fellini-accent pl-6 md:pl-10">"{selectedDish.signal}"</div>
                  
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                     <div className="space-y-8">
                        <div className="font-mono text-[10px] text-fellini-accent uppercase tracking-widest font-black flex items-center gap-3"><Box size={14}/> Specification Lock</div>
                        <div className="space-y-4">
@@ -2118,239 +2120,329 @@ function ForgeDashboard() {
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
 
-      {/* --- Print-Only Specification Card --- */}
-      {printedDish && (
-        <div id="print-section" className="bg-white text-black p-12 z-[9999]" style={{ display: 'none' }}>
-           <div className="border-4 border-black p-8 h-full flex flex-col">
-              <div className="flex justify-between items-start border-b-4 border-black pb-6 mb-8">
-                 <div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.4em] font-black mb-2 text-slate-500">Galyons Master Bible // Recipe Card</div>
-                    <h1 className="font-sans text-5xl font-black uppercase tracking-tighter m-0">{printedDish.title}</h1>
-                    <div className="font-mono text-sm font-bold mt-2">{printedDish.id} // {printedDish.tag}</div>
-                 </div>
-                 <div className="text-right">
-                    <div className="font-mono text-[10px] uppercase font-black mb-1">Station Authority</div>
-                    <div className="font-sans font-black text-2xl uppercase">
-                      {STATIONS.find(s => {
-                         if (printedDish.id.startsWith('main')) return s.id === 'mains';
-                         if (printedDish.id.startsWith('sup')) return s.id === 'prep';
-                         if (printedDish.id === 'sun01' || printedDish.id === 'prep024') return s.id === 'mains';
-                         return s.id === 'prep';
-                      })?.name || 'GENERIC'}
-                    </div>
-                    <div className="mt-2 text-right">
-                      <div className="font-mono text-[10px] uppercase font-black mb-1">Engine Source</div>
-                      <div className="font-sans font-black text-sm uppercase">
-                        {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.name?.replace('\n', ' ') || 'MASTER'}
-                      </div>
-                    </div>
-                 </div>
-              </div>
+function PrintSpecCard({ dish }: { dish: Dish }) {
+  const engine = ENGINES.find(e => e.items.some(item => item.id === dish.id));
+  const station = STATIONS.find(s => {
+    if (dish.id.startsWith('main')) return s.id === 'mains';
+    if (dish.id.startsWith('sup')) return s.id === 'prep';
+    if (dish.id === 'sun01' || dish.id === 'prep024') return s.id === 'mains';
+    return s.id === 'prep';
+  });
 
-              <div className="grid grid-cols-2 gap-12 mb-12 flex-1">
-                 <div className="space-y-8">
-                    <section>
-                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Metadata / Yield</h2>
-                       <div className="grid grid-cols-2 gap-4">
-                          {printedDish.meta?.map((m, i) => (
-                             <div key={i}>
-                                <div className="font-mono text-[9px] uppercase text-slate-500">{m.label}</div>
-                                <div className="font-sans text-sm font-bold uppercase">{m.value}</div>
-                             </div>
-                          ))}
-                          <div>
-                             <div className="font-mono text-[9px] uppercase text-slate-500">Status</div>
-                             <div className="font-sans text-sm font-bold uppercase">{printedDish.meta?.find((m: any) => m.label === 'Status')?.value || 'VERIFIED'}</div>
-                          </div>
-                          <div>
-                             <div className="font-mono text-[9px] uppercase text-slate-500">Founder Law</div>
-                             <div className="font-sans text-sm font-bold uppercase">{printedDish.founderLawLocked ? 'LOCKED' : 'BETA'}</div>
-                          </div>
-                       </div>
-                    </section>
-
-                    <section>
-                     {printedDish.wmm && (
-                       <section className="print-section">
-                         <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">WMM — Weights / Measures / Method</h2>
-                         <div className="grid grid-cols-3 gap-6">
-                           <div className="border-r border-black pr-4">
-                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Weights</h4>
-                             <ul className="space-y-1">
-                               {printedDish.wmm.weights.map((item, index) => (
-                                 <li key={`weight-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{item}</li>
-                               ))}
-                             </ul>
-                           </div>
-                           <div className="border-r border-black pr-4">
-                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Measures</h4>
-                             <ul className="space-y-1">
-                               {printedDish.wmm.measures.map((item, index) => (
-                                 <li key={`measure-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{item}</li>
-                               ))}
-                             </ul>
-                           </div>
-                           <div>
-                             <h4 className="font-mono text-[9px] uppercase font-black mb-2 text-slate-400">Method Block</h4>
-                             <ul className="space-y-1">
-                               {printedDish.wmm.method.map((step, index) => (
-                                 <li key={`method-${index}`} className="font-sans text-[11px] font-bold uppercase tracking-tight">{step}</li>
-                               ))}
-                             </ul>
-                           </div>
-                         </div>
-                       </section>
-                     )}
-                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Technical Spec</h2>
-                       <div className="space-y-3">
-                          {printedDish.fullSpec && Object.entries(printedDish.fullSpec).map(([k, v]) => (
-                             <div key={k} className="flex justify-between items-baseline gap-4">
-                                <span className="font-mono text-[10px] uppercase text-slate-500 whitespace-nowrap">{k}</span>
-                                <span className="font-sans text-xs font-bold text-right leading-tight">{typeof v === 'string' ? v : String(v)}</span>
-                             </div>
-                          ))}
-                       </div>
-                    </section>
-
-                    {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.layers.timeLaw && (
-                      <section>
-                         <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Time Law (Engine Baseline)</h2>
-                         <div className="space-y-2">
-                           {ENGINES.find(e => e.items.some(item => item.id === printedDish.id))?.layers.timeLaw.map((tl, index) => (
-                             <div key={index} className="flex justify-between items-center text-xs">
-                               <span className="font-mono text-[9px] uppercase">{tl.step}</span>
-                               <span className={`font-sans font-bold ${tl.critical ? 'text-red-600' : ''}`}>{tl.duration}</span>
-                             </div>
-                           ))}
-                         </div>
-                      </section>
-                    )}
-                    
-                    <section>
-                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Signals & Recovery</h2>
-                       <div className="space-y-4">
-                          <div>
-                             <div className="font-mono text-[9px] uppercase text-slate-500">Release Signals (Pass Authority)</div>
-                             <ul className="list-disc list-inside font-sans text-xs font-medium italic">
-                                {printedDish.passSignals?.map((s, i) => <li key={i}>{s}</li>)}
-                                {!printedDish.passSignals && <li>Visual verification by Station Master</li>}
-                             </ul>
-                          </div>
-                          <div>
-                             <div className="font-mono text-[9px] uppercase text-slate-500">Reject Boundary (Fail Protocol)</div>
-                             <div className="font-sans text-xs font-bold uppercase text-red-600">{printedDish.reject || 'STATION DEFAULT'}</div>
-                          </div>
-                          <div>
-                             <div className="font-mono text-[9px] uppercase text-slate-500">Max Recovery</div>
-                             <div className="font-sans text-xs font-bold uppercase">{printedDish.maxRecovery || 'NO RECOVERY — REJECT ONLY'}</div>
-                          </div>
-                       </div>
-                    </section>
-                 </div>
-
-                 <div className="space-y-8 border-l-2 border-black pl-12">
-                    <section>
-                       <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Method Logic</h2>
-                       <div className="space-y-4">
-                          {printedDish.method?.map((m, i) => (
-                             <div key={i} className="flex gap-4">
-                                <span className="font-mono text-xs font-bold">{i + 1}.</span>
-                                <p className="font-sans text-sm leading-snug">{m}</p>
-                             </div>
-                          ))}
-                       </div>
-                    </section>
-                    
-                    <section className="bg-slate-100 p-6 rounded border-2 border-black">
-                       <h2 className="font-mono text-[10px] uppercase font-black mb-2">Critical Note / Jemma Mapping</h2>
-                       <p className="font-serif italic text-base leading-tight mb-4">"{printedDish.criticalNote}"</p>
-                       <div className="font-mono text-[8px] uppercase font-black text-slate-500">Validator Ref: {printedDish.fullSpec?.Jemma || 'DEFAULT_GATE'}</div>
-                    </section>
-                 </div>
-              </div>
-
-              <div className="mt-auto pt-8 border-t-2 border-black flex justify-between items-end opacity-40">
-                 <div className="font-mono text-[8px] uppercase tracking-widest">Printed via Galyons Forge v3.0 // Master Pulse // System Time: {new Date().toLocaleString()}</div>
-                 <div className="font-mono text-[10px] font-black px-4 py-1 border-2 border-black">AUTHENTIC BIBLE COPY</div>
-              </div>
-           </div>
+  return (
+    <div className="bg-white text-black p-12 min-h-[297mm] w-[210mm]">
+      <div className="border-[6px] border-black p-10 min-h-[270mm] flex flex-col">
+        {/* Header Block */}
+        <div className="flex justify-between items-start border-b-[6px] border-black pb-8 mb-10">
+          <div>
+            <div className="font-mono text-[12px] uppercase tracking-[0.5em] font-black mb-3 text-slate-500">FORGE SYSTEM // MASTER SPECIFICATION CARD v2.9</div>
+            <h1 className="font-sans text-6xl font-black uppercase tracking-tighter m-0 leading-[0.9] mb-4">{dish.title}</h1>
+            <div className="flex gap-4">
+              <div className="bg-black text-white px-3 py-1 font-mono text-sm font-black">{dish.id}</div>
+              <div className="border-2 border-black px-3 py-1 font-mono text-sm font-black text-slate-600">{dish.tag}</div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-mono text-[10px] uppercase font-black mb-1 opacity-60">Authority Hub</div>
+            <div className="font-sans font-black text-4xl uppercase mb-4">{station?.name || 'MASTER'}</div>
+            <div className="font-mono text-[10px] uppercase font-black mb-1 opacity-60">Engine Cluster</div>
+            <div className="font-sans font-black text-lg uppercase">{engine?.name?.replace('\n', ' ') || 'SYSTEM CORE'}</div>
+          </div>
         </div>
-      )}
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          .no-print {
-            display: none !important;
-          }
-          .print-section,
-          .print-section * {
-            display: block !important;
-            visibility: visible !important;
-          }
-          #print-section {
-            display: block !important;
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            margin: 0 !important;
-            padding: 1.5cm !important;
-            background: white !important;
-            color: black !important;
-            z-index: 99999 !important;
-          }
-          html, body {
-            background-color: white !important;
-            width: 100% !important;
-            height: 100% !important;
-          }
-        }
-      `}} />
+        {/* Content Matrix */}
+        <div className="grid grid-cols-12 gap-12 flex-1">
+          {/* Left Column: Logic & Specs */}
+          <div className="col-span-5 space-y-10">
+            <section>
+              <h2 className="font-mono text-xs uppercase font-black bg-black text-white px-4 py-1 mb-4">01. Metadata / Identity</h2>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                {dish.meta?.map((m, i) => (
+                  <div key={i} className="border-b border-black/10 pb-1">
+                    <div className="font-mono text-[9px] uppercase text-slate-400 font-bold">{m.label}</div>
+                    <div className="font-sans text-sm font-black uppercase">{m.value}</div>
+                  </div>
+                ))}
+                <div className="border-b border-black/10 pb-1">
+                  <div className="font-mono text-[9px] uppercase text-slate-400 font-bold">Forge Status</div>
+                  <div className="font-sans text-sm font-black uppercase text-green-600">VERIFIED_LAW</div>
+                </div>
+                <div className="border-b border-black/10 pb-1">
+                  <div className="font-mono text-[9px] uppercase text-slate-400 font-bold">Law Lock</div>
+                  <div className="font-sans text-sm font-black uppercase">{dish.founderLawLocked ? 'LOCKED (FOUNDER)' : 'ADAPTIVE'}</div>
+                </div>
+              </div>
+            </section>
+
+            {dish.wmm && (
+              <section>
+                <h2 className="font-mono text-xs uppercase font-black bg-black text-white px-4 py-1 mb-4">02. WMM Mapping</h2>
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <h4 className="font-mono text-[10px] uppercase font-black mb-2 text-slate-500 border-b border-black/20">Weights</h4>
+                      <ul className="space-y-1">
+                        {dish.wmm.weights.map((w, i) => (
+                          <li key={i} className="font-sans text-[11px] font-bold uppercase">{w}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-mono text-[10px] uppercase font-black mb-2 text-slate-500 border-b border-black/20">Measures</h4>
+                      <ul className="space-y-1">
+                        {dish.wmm.measures.map((m, i) => (
+                          <li key={i} className="font-sans text-[11px] font-bold uppercase">{m}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-mono text-[10px] uppercase font-black mb-2 text-slate-500 border-b border-black/20">System Method Block</h4>
+                    <p className="font-sans text-[11px] leading-tight font-medium uppercase">{dish.wmm.method.join(' // ')}</p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            <section>
+              <h2 className="font-mono text-xs uppercase font-black bg-black text-white px-4 py-1 mb-4">03. Performance Boundaries</h2>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-3 border border-black/10">
+                    <div className="font-mono text-[9px] uppercase font-bold text-slate-500">Pass Signals</div>
+                    <ul className="list-disc list-inside mt-1 font-sans text-[10px] font-bold uppercase leading-tight">
+                      {dish.passSignals?.map((s, i) => <li key={i}>{s}</li>) || <li>Visual verification by Station Lead</li>}
+                    </ul>
+                  </div>
+                  <div className="bg-red-50 p-3 border border-red-200">
+                    <div className="font-mono text-[9px] uppercase font-bold text-red-600">Reject Boundary</div>
+                    <div className="font-sans text-xs font-black uppercase text-red-700 mt-1">{dish.reject}</div>
+                  </div>
+                </div>
+                <div className="bg-slate-50 p-3 border border-black/10">
+                  <div className="font-mono text-[9px] uppercase font-bold text-slate-500">Recovery Logic</div>
+                  <div className="font-sans text-xs font-bold uppercase mt-1">{dish.maxRecovery || 'NO RECOVERY PATH AVAILABLE'}</div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Right Column: Narrative & Logic */}
+          <div className="col-span-7 border-l-[3px] border-black pl-12 space-y-10">
+            <section>
+              <h2 className="font-mono text-xs uppercase font-black bg-black text-white px-4 py-1 mb-4">04. Execution Flow</h2>
+              <div className="space-y-6">
+                {dish.method?.map((step, i) => (
+                  <div key={i} className="flex gap-4 items-start">
+                    <span className="font-mono text-lg font-black text-slate-300">0{i + 1}</span>
+                    <p className="font-sans text-base leading-snug font-bold uppercase tracking-tight">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="bg-black text-white p-8">
+              <div className="flex gap-4 items-center mb-4">
+                <Brain size={24} className="text-white" />
+                <h2 className="font-mono text-sm uppercase font-black">Critical Note / Jemma Kernel</h2>
+              </div>
+              <p className="font-serif italic text-2xl leading-tight mb-4 text-white">"{dish.criticalNote}"</p>
+              <div className="font-mono text-[9px] uppercase text-slate-400 font-bold border-t border-white/20 pt-4 flex justify-between">
+                <span>Validator Ref: {dish.fullSpec?.Jemma || 'PROTO_GATE_ALPHA'}</span>
+                <span>Portion GP: {engine?.layers.gpControl.targetMargin || '72%'} LOCK</span>
+              </div>
+            </section>
+
+            <div className="grid grid-cols-2 gap-8">
+              {engine?.layers.timeLaw && (
+                <section>
+                  <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Time Law Baseline</h2>
+                  <div className="space-y-2">
+                    {engine.layers.timeLaw.map((tl, i) => (
+                      <div key={i} className="flex justify-between items-center text-xs border-b border-black/5 pb-1">
+                        <span className="font-mono text-[9px] uppercase font-bold text-slate-500">{tl.step}</span>
+                        <span className={`font-sans font-black ${tl.critical ? 'text-red-600' : ''}`}>{tl.duration}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+              <section>
+                <h2 className="font-mono text-xs uppercase font-black border-b-2 border-black pb-1 mb-4">Allergen Shield</h2>
+                <div className="bg-yellow-50 p-4 border border-yellow-200">
+                  <div className="font-mono text-[9px] uppercase font-black text-yellow-800 mb-2">Protocol: {engine?.layers.allergenGate.protocol || 'STANDARD GATE'}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {engine?.layers.allergenGate.highRisk.map((r, i) => (
+                      <span key={i} className="text-[10px] font-black uppercase text-yellow-900 border border-yellow-400 px-2 py-0.5 rounded">{r}</span>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Audit Trail */}
+        <div className="mt-12 pt-10 border-t-[6px] border-black flex justify-between items-end opacity-60">
+          <div className="space-y-1">
+            <div className="font-mono text-[9px] uppercase tracking-widest font-black">Secure Bible Extraction Node // Galyons v3.0</div>
+            <div className="font-mono text-[9px] uppercase text-slate-400">Timestamp: {new Date().toLocaleString()} // ID: {dish.id}</div>
+          </div>
+          <div className="font-mono text-[12px] font-black px-6 py-2 border-[3px] border-black uppercase">Official Master Bible Copy</div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function App() {
   const [isEntered, setIsEntered] = useState(false);
+  const [printedDish, setPrintedDish] = useState<Dish | null>(null);
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
 
-  if (!isEntered) {
-    return (
-      <div className="fixed inset-0 bg-fellini-bg flex flex-col items-center justify-center p-8 text-center overscroll-none overflow-hidden h-screen select-none font-sans">
-        <div className="scanline-overlay pointer-events-none opacity-20" />
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           className="relative z-10 p-12 bg-white/80 backdrop-blur-xl border border-fellini-rule shadow-2xl max-w-2xl rounded-2xl"
-        >
-          <div className="engine-rule mx-auto mb-12" />
-          <span className="font-mono text-[10px] tracking-[0.5em] text-fellini-ghost uppercase block mb-6 px-12">
-            GALYONS — RODZ 2026 SYSTEM KERNEL
-          </span>
-          <h1 className="font-sans text-6xl md:text-8xl font-bold tracking-tight text-fellini-black uppercase leading-tight mb-6">
-            FELLINI MASTER BIBLE v2.9.2
-          </h1>
-          <div className="font-mono text-[11px] text-fellini-accent mb-12 tracking-[0.3em]">
-            v2.9.2.STABLE · Octagon Engine Active · Adaptive Authority Locked
-          </div>
-          <button 
-            onClick={() => setIsEntered(true)}
-            className="group relative font-sans text-[12px] font-semibold tracking-[0.3em] text-white uppercase bg-fellini-black px-16 py-5 hover:scale-105 transition-all rounded-full shadow-lg"
+  useEffect(() => {
+    const handleAfterPrint = () => {
+      // Do not auto-close preview, let user close it if they want, 
+      // but clear the print-root dish to prevent ghost prints?
+      // Actually, user wants it clean.
+    };
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => window.removeEventListener('afterprint', handleAfterPrint);
+  }, []);
+
+  const handlePrintTrigger = (dish: Dish) => {
+    console.log("[PRINT_PREVIEW_OPEN_REQUEST]", dish?.id, dish?.title);
+    setPrintedDish(dish);
+    setPrintPreviewOpen(true);
+  };
+
+  return (
+    <div className="relative min-h-screen">
+      {!isEntered ? (
+        <div className="fixed inset-0 bg-fellini-bg flex flex-col items-center justify-center p-4 md:p-8 text-center overscroll-none overflow-hidden h-screen select-none font-sans">
+          <div className="scanline-overlay pointer-events-none opacity-20" />
+          <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="relative z-10 p-6 md:p-12 bg-white/80 backdrop-blur-xl border border-fellini-rule shadow-2xl max-w-2xl rounded-2xl w-full"
           >
-            <span className="relative z-10 font-black">Initiate Octagon v2.0</span>
-            <motion.div 
-               className="absolute inset-0 bg-fellini-accent/20 -translate-x-full"
-               whileHover={{ translateX: "100%" }}
-               transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
+            <div className="engine-rule mx-auto mb-8 md:mb-12" />
+            <span className="font-mono text-[8px] md:text-[10px] tracking-[0.3em] md:tracking-[0.5em] text-fellini-ghost uppercase block mb-4 md:mb-6 px-4 md:px-12">
+              GALYONS — RODZ 2026 SYSTEM KERNEL
+            </span>
+            <h1 className="font-sans text-4xl md:text-8xl font-bold tracking-tight text-fellini-black uppercase leading-tight mb-4 md:mb-6">
+              FELLINI MASTER BIBLE v2.9.2
+            </h1>
+            <div className="font-mono text-[9px] md:text-[11px] text-fellini-accent mb-8 md:mb-12 tracking-[0.2em] md:tracking-[0.3em]">
+              v2.9.2.STABLE · Octagon Engine Active · Adaptive Authority Locked
+            </div>
+            <button 
+              onClick={() => setIsEntered(true)}
+              className="group relative font-sans text-[10px] md:text-[12px] font-semibold tracking-[0.2em] md:tracking-[0.3em] text-white uppercase bg-fellini-black px-10 md:px-16 py-4 md:py-5 hover:scale-105 transition-all rounded-full shadow-lg"
+            >
+              <span className="relative z-10 font-black">Initiate Octagon v2.0</span>
+              <motion.div 
+                 className="absolute inset-0 bg-fellini-accent/20 -translate-x-full"
+                 whileHover={{ translateX: "100%" }}
+                 transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </button>
+            
+            <div className="mt-8 flex justify-center">
+               <button
+                 onClick={() => handlePrintTrigger(ENGINES[1].items[0])}
+                 className="text-[8px] font-mono font-bold text-fellini-ghost hover:text-fellini-accent uppercase tracking-widest border border-dashed border-fellini-rule px-4 py-1 rounded"
+               >
+                 Diagnostic Test Print
+               </button>
+            </div>
+          </motion.div>
+        </div>
+      ) : (
+        <ForgeDashboard onPrintSet={handlePrintTrigger} printedDish={printedDish} />
+      )}
+      
+      {/* 
+          Visible Print Preview Layer 
+          This proves the document exists before window.print() is called.
+      */}
+      <AnimatePresence>
+        {printPreviewOpen && printedDish && (
+          <motion.div 
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed inset-0 z-[200] bg-white overflow-y-auto no-print"
+          >
+            <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-fellini-rule p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4 z-50 shadow-sm">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-fellini-black text-white rounded-full flex items-center justify-center shadow-lg">
+                     <Printer size={24} />
+                  </div>
+                  <div>
+                    <div className="font-mono text-[10px] font-black uppercase tracking-widest text-fellini-accent">Master Spec Preview</div>
+                    <h2 className="font-sans text-xl md:text-2xl font-black uppercase tracking-tight">{printedDish.title}</h2>
+                  </div>
+               </div>
+               
+               <div className="flex items-center gap-3 w-full md:w-auto">
+                  <button 
+                    onClick={() => {
+                      console.log("[PRINT_EXECUTE_ACTION]", printedDish.id);
+                      requestAnimationFrame(() => {
+                        setTimeout(() => window.print(), 250);
+                      });
+                    }}
+                    className="flex-1 md:flex-none bg-fellini-accent hover:bg-fellini-accent/90 text-fellini-black px-8 py-4 rounded-full font-sans font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-xl border-2 border-fellini-black/10 transition-transform active:scale-95"
+                  >
+                    <Printer size={18} /> Print Now
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setPrintPreviewOpen(false);
+                      setPrintedDish(null);
+                    }}
+                    className="flex-1 md:flex-none bg-fellini-black hover:bg-fellini-black/90 text-white px-8 py-4 rounded-full font-sans font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-xl transition-transform active:scale-95"
+                  >
+                    <XCircle size={18} /> Close
+                  </button>
+               </div>
+            </header>
 
-  return <ForgeDashboard />;
+            <div className="max-w-screen-xl mx-auto p-0 md:p-12 flex flex-col items-center">
+               <div className="w-full max-w-4xl bg-slate-50 border-2 border-dashed border-slate-200 p-4 mb-4 md:mb-8 rounded-xl text-center font-mono text-[10px] text-slate-400 uppercase font-bold no-print mx-4">
+                  Visible preview of the final print document. Inspect format below.
+               </div>
+               
+               {/* Scaling wrapper for mobile viewport centering */}
+               <div className="w-full overflow-hidden pb-12 flex justify-center no-print px-4">
+                  <div className="bg-white shadow-2xl border border-slate-200 rounded-lg overflow-hidden origin-top scale-[0.38] sm:scale-[0.7] md:scale-100 mb-[-580px] sm:mb-[-150px] md:mb-0 transition-transform duration-300">
+                     <PrintSpecCard dish={printedDish} />
+                  </div>
+               </div>
+
+               <div className="mt-12 mb-24 text-center no-print">
+                  <div className="font-mono text-[10px] text-fellini-ghost uppercase tracking-widest">End of Specification Log</div>
+               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Deterministic Hidden Print Root for window.print() */}
+      <div id="print-root" className="hidden print:block absolute inset-0 z-[99999] bg-white">
+        {printedDish ? (
+           <PrintSpecCard dish={printedDish} />
+        ) : (
+           <div className="p-20 text-center font-mono uppercase text-red-600 font-bold">
+              PRINT ERROR: NO DISH DATA RECEIVED
+           </div>
+        )}
+      </div>
+    </div>
+  );
 }
